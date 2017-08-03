@@ -5,7 +5,7 @@ app.set('view engine', 'ejs');
 app.get('/', function(req, res){
 	res.render('index',
 		{
-			names: ['Kyal', 'Jonathan', 'Simon']
+			names: ['Kyals', 'Jonathan', 'Simon']
 
 		});
 });
