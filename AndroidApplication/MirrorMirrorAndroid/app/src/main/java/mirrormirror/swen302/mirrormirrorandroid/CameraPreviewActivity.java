@@ -7,10 +7,23 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
+import android.view.View;
+import android.widget.Button;
 import android.widget.FrameLayout;
+
+import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.Socket;
+
+import org.json.JSONObject;
+
+import java.io.File;
+import java.net.URISyntaxException;
+import java.util.HashMap;
 
 public class CameraPreviewActivity extends AppCompatActivity {
 
+    private static final String SERVER_ADDRESS = "ws://192.168.1.13:3000";
     private Camera frontCamera;
     private CameraPreview frontCameraPreview;
 
@@ -19,7 +32,6 @@ public class CameraPreviewActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera_preview);
-
         beginCameraSession();
     }
 
@@ -30,6 +42,48 @@ public class CameraPreviewActivity extends AppCompatActivity {
         FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
         preview.addView(frontCameraPreview,0);
 
+        Button captureButton = (Button)findViewById(R.id.button_capture);
+        captureButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                frontCamera.takePicture(null, null, picture);
+            }
+        });
+
+    }
+
+    private Camera.PictureCallback picture = new Camera.PictureCallback() {
+        @Override
+        public void onPictureTaken(byte[] data, Camera camera) {
+            sendImageAsBytes(data);
+        }
+    };
+
+    private void sendImageAsBytes( byte[] imageBytes){
+        int x = 0;
+        requestInternetPermission();
+        Socket socket = null;
+        try {
+            socket = IO.socket(SERVER_ADDRESS);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        socket.connect();
+
+        socket.emit("connection", "hello it me");
+
+        String byteString = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        JSONObject messageObject = new JSONObject();
+        try {
+            messageObject.put("username", "hi");
+            messageObject.put("image", byteString);
+
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        socket.emit("image event", messageObject);
     }
 
     public void requestCameraPermission(){
@@ -51,6 +105,33 @@ public class CameraPreviewActivity extends AppCompatActivity {
 
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.CAMERA}, 0);
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        }
+    }
+
+    public void requestInternetPermission(){
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.INTERNET)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.INTERNET)) {
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+            } else {
+
+                // No explanation needed, we can request the permission.
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.INTERNET}, 0);
 
                 // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
                 // app-defined int constant. The callback method gets the
