@@ -5,7 +5,7 @@ router.get('/', function(req, res) {
   //res.render('index', {
     //title: 'Home'
   //})
-  res.send('hello world')
+  res.render('index');
 })
 
 router.get('/login', function(req, res) {
