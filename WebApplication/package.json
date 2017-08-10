@@ -4,7 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/.bin/mocha",
+    "gulp": "gulp"
   },
   "author": "",
   "license": "ISC",
@@ -13,5 +14,14 @@
     "express": "^4.15.4",
     "file-system": "^2.2.2",
     "socket.io": "^2.0.3"
+  },
+  "devDependencies": {
+    "chai": "^4.1.1",
+    "gulp": "^3.9.1",
+    "gulp-build": "^0.5.3",
+    "gulp-mocha": "^4.3.1",
+    "gulp-nodemon": "^2.2.1",
+    "gulp-util": "^3.0.8",
+    "mocha": "^3.5.0"
   }
 }

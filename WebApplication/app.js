@@ -14,6 +14,7 @@ var image_event = "image event";
 
 server.listen(port, function(){
   console.log("Listening on port " + port);
+
 });
 
 app.set('view engine', 'ejs');
