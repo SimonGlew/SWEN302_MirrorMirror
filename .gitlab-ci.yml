@@ -11,7 +11,7 @@ before_script:
 stages:
   - build_test
 
-build_&_test_app:
+build_test:
   stage: build_test
   only:
    - US1-Web-Application
