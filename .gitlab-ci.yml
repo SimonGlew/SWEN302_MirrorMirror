@@ -1,0 +1,20 @@
+image: node:latest
+
+cache:
+  paths:
+   - node_modules/
+
+before_script:
+  - npm install -g gulp
+  - npm install
+
+stages:
+  - build_test
+
+build_&_test_app:
+  stage: build_test
+  only:
+   - US1-Web-Application
+  script:
+   - gulp build
+   - gulp mocha
