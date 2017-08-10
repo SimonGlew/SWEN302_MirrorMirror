@@ -1,8 +1,10 @@
 package mirrormirror.swen302.mirrormirrorandroid;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +28,7 @@ public class CameraPreviewActivity extends AppCompatActivity {
     private static final String SERVER_ADDRESS = "ws://192.168.1.13:3000";
     private Camera frontCamera;
     private CameraPreview frontCameraPreview;
+
 
 
     @Override
@@ -55,9 +58,31 @@ public class CameraPreviewActivity extends AppCompatActivity {
     private Camera.PictureCallback picture = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
-            sendImageAsBytes(data);
+
+//            String dataString = Base64.encodeToString(data, Base64.DEFAULT);
+//            resultData.setData(Uri.parse(dataString));
+//
+//            setResult(RESULT_OK, resultData);
+//            finish();
+            result(data);
+            //sendImageAsBytes(data);
+            //request permissions to write to external storage
+
+            //Save image in external storage maybe interanl?
+
+
+
+            //display image on in view
         }
     };
+
+    private void result(byte[] data){
+
+        Intent resultData = new Intent();
+        resultData.putExtra("imageBytes", data);
+        setResult(RESULT_OK, resultData);
+        finish();
+    }
 
     private void sendImageAsBytes( byte[] imageBytes){
         int x = 0;
@@ -69,8 +94,6 @@ public class CameraPreviewActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         socket.connect();
-
-        socket.emit("connection", "hello it me");
 
         String byteString = Base64.encodeToString(imageBytes, Base64.DEFAULT);
         JSONObject messageObject = new JSONObject();
