@@ -14,7 +14,7 @@ stages:
 build_&_test_app:
   stage: build_test
   only:
-   - US1-Web-Application
+   - US1-Web-Application 
   script:
    - gulp build
    - gulp mocha
