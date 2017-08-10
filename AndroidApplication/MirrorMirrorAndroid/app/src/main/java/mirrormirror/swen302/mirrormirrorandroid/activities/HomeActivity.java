@@ -1,19 +1,20 @@
-package mirrormirror.swen302.mirrormirrorandroid;
+package mirrormirror.swen302.mirrormirrorandroid.activities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 
 import java.io.FileInputStream;
+
+import mirrormirror.swen302.mirrormirrorandroid.R;
+import mirrormirror.swen302.mirrormirrorandroid.activities.CameraPreviewActivity;
 
 /**
  * Created by bondkyal on 10/08/17.
@@ -70,14 +71,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void loadImages(){
-        try{
-            FileInputStream fis = openFileInput("image1");
-            Bitmap image = BitmapFactory.decodeStream(fis);
-            mainImage.setImageBitmap(image);
-            fis.close();
-        }catch(Exception e){
-            e.printStackTrace();
-        }
+
 
     }
 }

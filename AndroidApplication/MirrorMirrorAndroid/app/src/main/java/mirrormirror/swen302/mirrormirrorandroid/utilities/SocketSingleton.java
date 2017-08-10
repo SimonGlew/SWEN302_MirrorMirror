@@ -1,17 +1,11 @@
-package mirrormirror.swen302.mirrormirrorandroid;
+package mirrormirror.swen302.mirrormirrorandroid.utilities;
 
 import android.content.Context;
-import android.content.Intent;
 
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
-import com.github.nkzawa.socketio.client.SocketIOException;
 
-import org.json.JSONObject;
-
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 /**
  * Created by Jack on 7/08/2017.
