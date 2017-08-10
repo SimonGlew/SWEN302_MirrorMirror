@@ -28,8 +28,9 @@ io.on('connection', function(socket) {
 
 	socket.on(imageEvent, function(data) {
 		var uid = data.uid;
+		var datetime = data.datetime;
 		var imageString = data.image;
-		saveImage(imageString, uid);
+		saveImage(imageString, uid, datetime);
 	});
 
 	socket.on(weightEvent, function(data) {
@@ -40,16 +41,15 @@ io.on('connection', function(socket) {
 
 });
 
-
-function saveImage(imageString, uid) {
+function saveImage(imageString, uid, datetime) {
 	//TODO: GET UID FROM DEVICE
 
-	var filepath = './public/images/' + getCurrentDate() + '.jpg';
+	var filepath = './public/images/' + uid + '_' + datetime + '.jpg';
 	var bitmap = new Buffer(imageString, 'base64');
 	//Save Photo to filepath
 	fs.writeFileSync(filepath, bitmap);
 	//Record filepath in database
-	db.savePhoto(uid, new Date(), filepath);
+	db.savePhoto(uid, datetime, filepath);
 };
 
 function getCurrentDate() {
@@ -63,5 +63,3 @@ function getCurrentDate() {
 
 	return year + '' + month + '' + day + '' + hours + '' + minutes + '' + seconds;
 };
-
-	

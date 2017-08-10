@@ -31,7 +31,7 @@ function formatDateTime(datetime){
  
 function savePhoto(uid, datetime, filepath){
 	var stmt = db.prepare('INSERT INTO photos(UID, DateTime, FilePath) VALUES (?, ?, ?)');
-	stmt.run(uid, formatDateTime(datetime), filepath);
+	stmt.run(uid, datetime, filepath);
 	stmt.finalize();
 }
 db.savePhoto = savePhoto;
