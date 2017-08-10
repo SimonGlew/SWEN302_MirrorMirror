@@ -1,6 +1,7 @@
 package mirrormirror.swen302.mirrormirrorandroid;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
@@ -20,12 +21,14 @@ import com.github.nkzawa.socketio.client.Socket;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 
 public class CameraPreviewActivity extends AppCompatActivity {
 
-    private static final String SERVER_ADDRESS = "ws://192.168.1.13:3000";
+    private static final String SERVER_ADDRESS = "http://130.195.6.76:3000";
     private Camera frontCamera;
     private CameraPreview frontCameraPreview;
 
@@ -59,27 +62,21 @@ public class CameraPreviewActivity extends AppCompatActivity {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
 
-//            String dataString = Base64.encodeToString(data, Base64.DEFAULT);
-//            resultData.setData(Uri.parse(dataString));
-//
-//            setResult(RESULT_OK, resultData);
-//            finish();
-            result(data);
-            //sendImageAsBytes(data);
+            sendImageAsBytes(data);
             //request permissions to write to external storage
 
             //Save image in external storage maybe interanl?
 
 
+            result(data);
 
             //display image on in view
         }
     };
 
     private void result(byte[] data){
-
+        storeImage("image1", data);
         Intent resultData = new Intent();
-        resultData.putExtra("imageBytes", data);
         setResult(RESULT_OK, resultData);
         finish();
     }
@@ -162,5 +159,15 @@ public class CameraPreviewActivity extends AppCompatActivity {
             }
         }
     }
+
+    public void storeImage(String fileName, byte[] data){
+        try {
+            FileOutputStream fos = openFileOutput(fileName, Context.MODE_PRIVATE);
+            fos.write(data);
+            fos.close();
+        }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
 
 }

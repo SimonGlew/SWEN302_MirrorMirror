@@ -13,6 +13,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
+import java.io.FileInputStream;
+
 /**
  * Created by bondkyal on 10/08/17.
  */
@@ -26,6 +28,8 @@ public class HomeActivity extends AppCompatActivity {
     private ImageView mainImage;
 
     public static final int CAMERA_ACTIVITY_REQUEST_CODE = 10;
+
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,6 +58,7 @@ public class HomeActivity extends AppCompatActivity {
         if(item.getItemId() == R.id.take_image){
             Intent intent = new Intent(this, CameraPreviewActivity.class);
             startActivityForResult(intent, CAMERA_ACTIVITY_REQUEST_CODE);
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -61,16 +66,18 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        byte[] image = data.getByteArrayExtra("imageBytes");
-        setMainImage(image);
+        loadImages();
     }
 
-    private void setMainImage(byte[] imageBytes){
-        Bitmap image = null;
-        image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-        mainImage.setImageBitmap(image);
-//        mainImage.setVisibility(View.VISIBLE);
-        //mainImage.setBackgroundColor(Color.BLACK);
+    private void loadImages(){
+        try{
+            FileInputStream fis = openFileInput("image1");
+            Bitmap image = BitmapFactory.decodeStream(fis);
+            mainImage.setImageBitmap(image);
+            fis.close();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
     }
 }
