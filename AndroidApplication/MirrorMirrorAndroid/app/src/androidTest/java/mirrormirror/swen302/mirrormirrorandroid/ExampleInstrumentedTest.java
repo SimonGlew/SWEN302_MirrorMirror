@@ -1,4 +1,4 @@
-package victoria.ecs.mirrormirrorandroid;
+package mirrormirror.swen302.mirrormirrorandroid;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("victoria.ecs.mirrormirrorandroid", appContext.getPackageName());
+        assertEquals("mirrormirror.swen302.mirrormirrorandroid", appContext.getPackageName());
     }
 }

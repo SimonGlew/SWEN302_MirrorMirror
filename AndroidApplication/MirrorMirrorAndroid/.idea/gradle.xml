@@ -7,8 +7,8 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
-            <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/app" />
+            <option value="/am/rialto/home1/bondkyal/git/MirrorMirror/AndroidApplication/MirrorMirrorAndroid" />
+            <option value="/am/rialto/home1/bondkyal/git/MirrorMirror/AndroidApplication/MirrorMirrorAndroid/app" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
