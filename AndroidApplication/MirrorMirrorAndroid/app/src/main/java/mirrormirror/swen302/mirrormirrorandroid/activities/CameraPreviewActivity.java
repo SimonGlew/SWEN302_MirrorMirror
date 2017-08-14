@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.os.CountDownTimer;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +15,7 @@ import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
@@ -56,10 +59,29 @@ public class CameraPreviewActivity extends AppCompatActivity {
         captureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                frontCamera.takePicture(null, null, picture);
+                //frontCamera.takePicture(null, null, picture);
+                beginCameraCountdown();
             }
         });
 
+    }
+
+    private void beginCameraCountdown(){
+        CountDownTimer timer = new CountDownTimer(4000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                TextView countdown = (TextView) findViewById(R.id.countdown_display);
+                String remaining = String.valueOf(millisUntilFinished/1000);
+                countdown.setText(remaining);
+            }
+            @Override
+            public void onFinish() {
+                TextView countdown = (TextView) findViewById(R.id.countdown_display);
+                countdown.setText("");
+                frontCamera.takePicture(null, null, picture);
+            }
+        };
+        timer.start();
     }
 
     private Camera.PictureCallback picture = new Camera.PictureCallback() {
