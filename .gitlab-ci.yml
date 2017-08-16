@@ -11,7 +11,7 @@ before_script:
 stages:
   - build_test
 
-buildwithtests:
+build_test:
   stage: build_test
   script:
    echo "Starting gulp build"
