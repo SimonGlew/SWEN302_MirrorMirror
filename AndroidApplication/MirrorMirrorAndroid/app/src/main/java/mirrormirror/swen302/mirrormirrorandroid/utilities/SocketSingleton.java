@@ -14,7 +14,7 @@ import java.net.URISyntaxException;
 public class SocketSingleton {
 
     private static SocketSingleton instance;
-    private static final String SERVER_ADDRESS = "http://192.168.1.13:3000";
+    private static final String SERVER_ADDRESS = "http://192.168.56.1:3000";
     private Socket socket;
     private Context context;
 

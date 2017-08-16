@@ -1,8 +1,11 @@
 package mirrormirror.swen302.mirrormirrorandroid.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -12,9 +15,12 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Map;
 
 import mirrormirror.swen302.mirrormirrorandroid.R;
 import mirrormirror.swen302.mirrormirrorandroid.activities.CameraPreviewActivity;
+import mirrormirror.swen302.mirrormirrorandroid.utilities.ImageStorageManager;
 
 /**
  * Created by bondkyal on 10/08/17.
@@ -71,7 +77,25 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void loadImages(){
+        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.images_shared_preferences), Context.MODE_PRIVATE);
+        String image1 = sharedPreferences.getString("image1", null);
+        String image2 = sharedPreferences.getString("image2", null);
+        String image3 = sharedPreferences.getString("image3", null);
+        String image4 = sharedPreferences.getString("image4", null);
 
-
+        this.image1.setImageBitmap(ImageStorageManager.loadImageByName(image1, this));
+        this.image2.setImageBitmap(ImageStorageManager.loadImageByName(image2, this));
+        this.image3.setImageBitmap(ImageStorageManager.loadImageByName(image3, this));
+        this.image4.setImageBitmap(ImageStorageManager.loadImageByName(image4, this));
+        this.mainImage.setImageBitmap(ImageStorageManager.loadImageByName(image1, this));
+//        Map<String, ?> keyVals =  sharedPreferences.getAll();
+//        for(String s : keyVals.keySet()){
+//            switch(s){
+//                case "image1":
+//                    break;
+//                case "image2":
+//                    break;
+//            }
+//        }
     }
 }

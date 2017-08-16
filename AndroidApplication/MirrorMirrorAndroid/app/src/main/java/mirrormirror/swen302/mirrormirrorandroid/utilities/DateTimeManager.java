@@ -10,8 +10,12 @@ import java.util.Date;
 public class DateTimeManager {
     public static String getDatetimeAsString(){
         Date dateNow = new Date();
-        SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
         String dateTime = ft.format(dateNow);
         return dateTime;
+    }
+
+    public static Date getDateFromString(String stringDate){
+        return null;
     }
 }
