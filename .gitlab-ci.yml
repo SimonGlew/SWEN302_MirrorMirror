@@ -14,7 +14,9 @@ stages:
 buildwithtests:
   stage: build_test
   script:
+   echo "Starting gulp build"
    - gulp build
+   echo "Starting gulp testing"
    - npm run test
 
     
