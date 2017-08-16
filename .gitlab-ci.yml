@@ -11,7 +11,7 @@ before_script:
 stages:
   - build_test
 
-build_&_test_app:
+buildwithtests:
   stage: build_test
   script:
    - gulp build
