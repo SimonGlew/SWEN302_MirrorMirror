@@ -1,22 +1,20 @@
-#image: node:latest
+image: node:latest 
 
-#services:
-#  - mysql:latest
-#  - redis:latest
-#  - postgres:latest
+cache:
+  paths:
+   - node_modules/
 
+before_script:
+  - npm install -g gulp
+  - npm install
 
-#cache:
-#  paths:
-#  - node_modules/
+stages:
+  - build_test
 
-#test_async:
-#  script:
-#   - npm install
-#   - node ./specs/start.js ./specs/async.spec.js
+build_&_test_app:
+  stage: build_test
+  script:
+   - gulp build
+   - gulp mocha
 
-
-#test_db:
-#  script:
-#   - npm install
-#   - node ./specs/start.js ./specs/db-postgres.spec.js
+    
