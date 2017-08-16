@@ -15,6 +15,6 @@ buildwithtests:
   stage: build_test
   script:
    - gulp build
-   - gulp mocha
+   - npm run test
 
     
