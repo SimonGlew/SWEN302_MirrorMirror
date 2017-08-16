@@ -26,7 +26,7 @@ db.serialize(function() {
 });
 
 function formatDateTime(datetime){
-	return dateFormat(datetime, "yyyy-mm-dd hh:MM:ss");
+	return dateFormat(datetime, "yyyy-mm-dd_hh:MM:ss");
 }
  
 function savePhoto(uid, datetime, filepath){
