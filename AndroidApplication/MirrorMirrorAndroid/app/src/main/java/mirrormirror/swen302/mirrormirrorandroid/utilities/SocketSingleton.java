@@ -14,11 +14,11 @@ import java.net.URISyntaxException;
 public class SocketSingleton {
 
     private static SocketSingleton instance;
-    private static final String SERVER_ADDRESS = "http://192.168.56.1:3000";
+    private static final String SERVER_ADDRESS = "http://130.195.6.76:3000";
     private Socket socket;
     private Context context;
 
-    public static SocketSingleton get(Context context){
+    public static SocketSingleton getInstance(Context context){
         if(instance == null){
             instance = getSync(context);
         }

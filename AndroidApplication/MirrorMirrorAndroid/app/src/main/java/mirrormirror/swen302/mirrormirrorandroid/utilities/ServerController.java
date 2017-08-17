@@ -1,5 +1,6 @@
 package mirrormirror.swen302.mirrormirrorandroid.utilities;
 
+import android.content.Context;
 import android.util.Base64;
 
 import com.github.nkzawa.socketio.client.IO;
@@ -15,19 +16,14 @@ import java.net.URISyntaxException;
 
 public class ServerController {
 
-    private static final String SERVER_ADDRESS = "http://130.195.6.76:3000";
 
-    public static void sendImageAsBytes( byte[] imageBytes, String datetime){
+    public static void sendImageAsBytes( byte[] imageBytes, String datetime, Context context){
         int x = 0;
 
-        Socket socket = null;
-        try {
-            socket = IO.socket(SERVER_ADDRESS);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
+        Socket socket = SocketSingleton.getInstance(context).getSocket();
+        if(!socket.connected()) {
+            socket.connect();
         }
-        socket.connect();
-
         String byteString = Base64.encodeToString(imageBytes, Base64.DEFAULT);
         JSONObject messageObject = new JSONObject();
         try {
@@ -40,5 +36,24 @@ public class ServerController {
         }
 
         socket.emit("image event", messageObject);
+    }
+
+    public static void sendWeight(float weight, String datetime, Context context){
+        Socket socket = SocketSingleton.getInstance(context).getSocket();
+        if(!socket.connected()) {
+            socket.connect();
+        }
+
+        JSONObject messageObject = new JSONObject();
+        try {
+            messageObject.put("uid", "3");
+            messageObject.put("weight", weight);
+            messageObject.put("datetime", datetime);
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        socket.emit("weight event", messageObject);
     }
 }

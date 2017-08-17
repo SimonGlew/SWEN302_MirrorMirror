@@ -6,7 +6,7 @@
         android:id="@+id/take_image"
         app:showAsAction="always"
         android:title="TakeImage"
-        android:icon="@mipmap/ic_launcher_round"/>
+        android:icon="@drawable/ic_add_a_photo_white_24px"/>
 
 
 </menu>

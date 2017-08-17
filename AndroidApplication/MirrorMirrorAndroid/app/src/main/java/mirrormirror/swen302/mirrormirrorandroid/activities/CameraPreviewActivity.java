@@ -88,7 +88,7 @@ public class CameraPreviewActivity extends AppCompatActivity {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
             String dateTime = DateTimeManager.getDatetimeAsString();
-            ServerController.sendImageAsBytes(data, dateTime);
+            ServerController.sendImageAsBytes(data, dateTime, getApplicationContext());
             //request permissions to write to external storage
             //Save image in external storage maybe interanl?
             result(data, dateTime);
