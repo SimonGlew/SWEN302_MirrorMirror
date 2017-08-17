@@ -12,6 +12,7 @@ var port = 3000;
 
 var imageEvent = 'image event';
 var weightEvent = 'weight event';
+var requestImages = 'request images';
 
 server.listen(port, function() {
 	console.log('Listening on port ' + port);
@@ -34,9 +35,17 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on(weightEvent, function(data) {
-		var username = data.username;
+		var uid = data.uid;
 		var weight = data.weight;
 		db.saveWeight(uid, new Date(), weight);
+	});
+
+	socket.on(requestImages, function(data) {
+		var uid = data.uid;
+		var numImages = data.numImages;
+		var images = db.getLastImages(uid, numImages, function(results) {
+			//TODO socket.emit();
+		});
 	});
 
 });
