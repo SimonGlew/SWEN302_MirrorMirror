@@ -26,7 +26,7 @@ db.serialize(function() {
 });
 
 function formatDateTime(datetime){
-	return dateFormat(datetime, "yyyy-mm-dd hh:MM:ss");
+	return dateFormat(datetime, "yyyy-mm-dd_hh-MM-ss");
 }
  
 function savePhoto(uid, datetime, filepath){
@@ -42,5 +42,21 @@ function saveWeight(uid, datetime, weight){
 	stmt.finalize();
 }
 db.saveWeight = saveWeight;
+
+function getLastImages(uid, numImages, callback){
+	db.all("SELECT * FROM photos WHERE UID = " + uid + " ORDER BY DateTime DESC",  function (err, results){
+        if(err){
+            console.log(err);
+        }else{
+        	if(results.length < numImages){
+        		callback(results.slice(0, results.length));
+        	}else{
+         		callback(results.slice(0,numImages));
+        	
+        	}
+        }
+    });
+}
+db.getLastImages = getLastImages; 
 
 module.exports = db;
