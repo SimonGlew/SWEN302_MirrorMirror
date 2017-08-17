@@ -7,8 +7,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.Image;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,12 +24,16 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import mirrormirror.swen302.mirrormirrorandroid.R;
 import mirrormirror.swen302.mirrormirrorandroid.activities.CameraPreviewActivity;
+import mirrormirror.swen302.mirrormirrorandroid.adapters.HorizontalAdapter;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.DateTimeManager;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.ImageStorageManager;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.ServerController;
@@ -37,56 +44,39 @@ import mirrormirror.swen302.mirrormirrorandroid.utilities.ServerController;
 
 public class HomeActivity extends AppCompatActivity {
 
-    private ImageView image1;
-    private ImageView image2;
-    private ImageView image3;
-    private ImageView image4;
-    private ImageView mainImage;
 
     public static final int CAMERA_ACTIVITY_REQUEST_CODE = 10;
 
+    RecyclerView recyclerView;
+    HorizontalAdapter horizontalAdapter;
 
+    List<String> filePaths;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_activity);
-        setReferences();
-        setImageClickListeners();
-        setButtonClickListeners();
-        loadImages();
+//        setImageClickListeners();
+//        setButtonClickListeners();
+        initialLoadImages();
+        setRecyclerView();
+
+
     }
 
-    private void setImageClickListeners(){
-        image1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mainImage.setImageDrawable(image1.getDrawable());
-            }
-        });
-        image2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mainImage.setImageDrawable(image2.getDrawable());
-            }
-        });
-        image3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mainImage.setImageDrawable(image3.getDrawable());
-            }
-        });
-        image4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mainImage.setImageDrawable(image4.getDrawable());
-            }
-        });
+
+    private void setRecyclerView(){
+
+        recyclerView = (RecyclerView)findViewById(R.id.horizontal_recycler_view);
+        horizontalAdapter = new HorizontalAdapter(filePaths,this);
+        LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        recyclerView.setLayoutManager(horizontalLayoutManager);
+        recyclerView.setAdapter(horizontalAdapter);
     }
 
     private void setButtonClickListeners(){
 //        Button weightSubmit = (Button) findViewById(R.id.submit_weight);
-        final EditText weightField = (EditText)findViewById(R.id.weight_text_field);
+        //final EditText weightField = (EditText)findViewById(R.id.weight_text_field);
 
 //        weightSubmit.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -97,18 +87,18 @@ public class HomeActivity extends AppCompatActivity {
 //                hideKeyboard();
 //            }
 //        });
-        weightField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if(actionId == EditorInfo.IME_ACTION_DONE){
-                    Float weight = Float.valueOf(weightField.getText().toString());
-                    ServerController.sendWeight(weight, DateTimeManager.getDatetimeAsString(), getApplicationContext());
-                    weightField.clearFocus();
-                    hideKeyboard();
-                }
-                return false;
-            }
-        });
+//        weightField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+//            @Override
+//            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+//                if(actionId == EditorInfo.IME_ACTION_DONE){
+//                    Float weight = Float.valueOf(weightField.getText().toString());
+//                    ServerController.sendWeight(weight, DateTimeManager.getDatetimeAsString(), getApplicationContext());
+//                    weightField.clearFocus();
+//                    hideKeyboard();
+//                }
+//                return false;
+//            }
+//        });
     }
 
     private void hideKeyboard(){
@@ -124,14 +114,6 @@ public class HomeActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.toolbar, menu);
         return true;
-    }
-
-    private void setReferences() {
-        image1 = (ImageView) findViewById(R.id.image_1);
-        image2 = (ImageView) findViewById(R.id.image_2);
-        image3 = (ImageView) findViewById(R.id.image_3);
-        image4 = (ImageView) findViewById(R.id.image_4);
-        mainImage = (ImageView) findViewById(R.id.main_image);
     }
 
     @Override
@@ -150,17 +132,19 @@ public class HomeActivity extends AppCompatActivity {
         loadImages();
     }
 
-    private void loadImages(){
-        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.images_shared_preferences), Context.MODE_PRIVATE);
-        String image1 = sharedPreferences.getString("image1", null);
-        String image2 = sharedPreferences.getString("image2", null);
-        String image3 = sharedPreferences.getString("image3", null);
-        String image4 = sharedPreferences.getString("image4", null);
+    private void initialLoadImages(){
+        File[] files = getFilesDir().listFiles();
+        filePaths = new ArrayList<>(files.length);
+        for(int i = files.length-1; i >= 0; i --){
+            filePaths.add(files[i].getName());
+        }
+    }
 
-        this.image1.setImageBitmap(ImageStorageManager.loadImageByName(image1, this));
-        this.image2.setImageBitmap(ImageStorageManager.loadImageByName(image2, this));
-        this.image3.setImageBitmap(ImageStorageManager.loadImageByName(image3, this));
-        this.image4.setImageBitmap(ImageStorageManager.loadImageByName(image4, this));
-        this.mainImage.setImageBitmap(ImageStorageManager.loadImageByName(image1, this));
+    private void loadImages(){
+        File[] files = getFilesDir().listFiles();
+        for(int i = filePaths.size(); i < files.length; i ++){
+            filePaths.add(0,files[i].getName());
+        }
+        recyclerView.getAdapter().notifyDataSetChanged();
     }
 }
