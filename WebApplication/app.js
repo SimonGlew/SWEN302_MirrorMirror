@@ -12,6 +12,8 @@ var port = 3000;
 
 var imageEvent = 'image event';
 var weightEvent = 'weight event';
+var loginEvent = 'login event';
+var loginSuccessEvent = 'login success event';
 
 server.listen(port, function() {
 	console.log('Listening on port ' + port);
@@ -24,7 +26,17 @@ app.use('/', router);
 io.on('connection', function(socket) {
 
 	console.log('device connection, with id: ' + socket.id);
-	//TODO: SEND UID TO DEVICE
+
+	socket.on(loginEvent, function(data){
+		var username = data.username;
+		var password = data.password;
+
+		db.checkLoginDetails(username, password, function(results){
+			if(results != null){
+				socket.emit(loginSuccessEvent, { uid : results});
+			}
+		});
+	});
 
 	socket.on(imageEvent, function(data) {
 		var uid = data.uid;
@@ -34,7 +46,7 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on(weightEvent, function(data) {
-		var username = data.username;
+		var uid = data.uid;
 		var weight = data.weight;
 		db.saveWeight(uid, new Date(), weight);
 	});

@@ -43,4 +43,20 @@ function saveWeight(uid, datetime, weight){
 }
 db.saveWeight = saveWeight;
 
+function checkLoginDetails(username, password, callback){
+  db.all("SELECT UID FROM Users WHERE Username = " + username + " AND Password = " + password, function(err, results){
+    if(err){
+      console.log(err);
+    }else{
+      if(results.length == 0){
+        callback(null);
+      }else{
+        callback(results[0]);
+      }
+    }
+  });
+}
+db.checkLoginDetails = checkLoginDetails;
+
+
 module.exports = db;
