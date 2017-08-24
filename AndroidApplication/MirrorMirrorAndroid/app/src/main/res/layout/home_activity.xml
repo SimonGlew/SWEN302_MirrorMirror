@@ -1,87 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="horizontal" android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!--Image Display and History-->
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_height="match_parent"
-        android:layout_width="0dp"
-        android:layout_weight="1">
-        <!--Main Image-->
-        <ImageView
-            android:id="@+id/main_image"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:background="@color/colorPrimaryDark"
-            android:layout_weight="0.8"/>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.2">
+    <android.support.v4.widget.DrawerLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/horizontal_recycler_view"
-                android:background="#27002b"
-                android:layout_width="match_parent"
-                android:layout_height="fill_parent"
-                />
-        </LinearLayout>
+        <include layout="@layout/content_main"/>
 
-    </LinearLayout>
+        <!-- Sidebar drawer -->
+        <android.support.design.widget.NavigationView android:id="@+id/nav_view"
+            android:layout_width="wrap_content" android:layout_height="match_parent"
+            android:layout_gravity="start" android:fitsSystemWindows="true"
+            app:headerLayout="@layout/drawer_header" app:menu="@menu/drawer_menu" />
 
-    <!--Sidebar-->
-    <!--<LinearLayout-->
-        <!--android:orientation="vertical"-->
-        <!--android:layout_gravity="right"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_weight="0.25">-->
-        <!--&lt;!&ndash;Username field&ndash;&gt;-->
-        <!--<TextView-->
-           <!--android:id="@+id/user_identifier"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_weight="0"-->
-            <!--android:layout_gravity="right"-->
-            <!--android:padding="5dp"-->
-            <!--android:text="Jonathon Carr"-->
-            <!--android:textSize="24dp"/>-->
-        <!--&lt;!&ndash;Weight field&ndash;&gt;-->
-        <!--<LinearLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:orientation="horizontal"-->
-            <!--android:focusable="true"-->
-            <!--android:focusableInTouchMode="true">-->
-            <!--&lt;!&ndash;Weight Label&ndash;&gt;-->
-            <!--<TextView-->
-                <!--android:text="Weight"-->
-                <!--android:textSize="15dp"-->
-                <!--android:padding="5dp"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"/>-->
-            <!--&lt;!&ndash;Weight input Field&ndash;&gt;-->
-            <!--<EditText-->
-                <!--android:layout_width="100dp"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:id="@+id/weight_text_field"-->
-                <!--android:textSize="15dp"-->
-                <!--android:maxLines="1"-->
-                <!--android:inputType="number"-->
-                <!--/>-->
-            <!--&lt;!&ndash;<Button&ndash;&gt;-->
-                <!--&lt;!&ndash;android:id="@+id/submit_weight"&ndash;&gt;-->
-                <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
-                <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
-                <!--&lt;!&ndash;android:text="Submit"/>&ndash;&gt;-->
-
-        <!--</LinearLayout>-->
-
-    <!--</LinearLayout>-->
-
-
+    </android.support.v4.widget.DrawerLayout>
 
 </LinearLayout>
