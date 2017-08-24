@@ -14,6 +14,7 @@ var imageEvent = 'image event';
 var weightEvent = 'weight event';
 var loginEvent = 'login event';
 var loginSuccessEvent = 'login success event';
+var previousWeightsEvent = 'previous weight event';
 
 server.listen(port, function() {
 	console.log('Listening on port ' + port);
@@ -33,8 +34,15 @@ io.on('connection', function(socket) {
 
 		db.checkLoginDetails(username, password, function(results){
 			if(results != null){
-				socket.emit(loginSuccessEvent, { uid : results});
+				socket.emit(loginSuccessEvent, { uid : results.uid});
 			}
+		});
+	});
+
+	socket.on(previousWeightsEvent, function(data){
+		var uid = data.uid;
+		db.getPreviousWeights(uid, function(results){
+			//past 7 days of weights, could have more than 1 per day, has rows of (datetime, weight)
 		});
 	});
 

@@ -43,6 +43,16 @@ function saveWeight(uid, datetime, weight){
 }
 db.saveWeight = saveWeight;
 
+function getPreviousWeight(uid){
+  db.all("SELECT datetime, weight FROM weights WHERE DateTime BETWEEN datetime('now','-6 days') AND datetime('now', 'localtime') AND uid = " + uid + " ORDER BY DateTime DESC", function(err, results){
+    if(err){
+      console.log(err);
+    }else{
+      return results;
+    }
+  });
+}
+
 function checkLoginDetails(username, password, callback){
   db.all("SELECT UID FROM Users WHERE Username = " + username + " AND Password = " + password, function(err, results){
     if(err){
