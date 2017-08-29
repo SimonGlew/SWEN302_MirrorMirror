@@ -1,5 +1,6 @@
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database('MirrorMirror');
+var dbTest = new sqlite3.Database('MirrorMirrorTest');
 var dateFormat = require('dateformat');
 
 db.serialize(function() {
@@ -11,16 +12,38 @@ db.serialize(function() {
   	'Username varchar(255) NOT NULL, ' +
   	'Password varchar(255) NOT NULL)');
 
-  db.run('CREATE TABLE IF NOT EXISTS photos ' + 
+  db.run('CREATE TABLE IF NOT EXISTS photos ' +
   	'(UID INTEGER NOT NULL, ' +
   	'DateTime DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, ' +
-  	'FilePath varchar(255) NOT NULL, ' + 
+  	'FilePath varchar(255) NOT NULL, ' +
   	'PRIMARY KEY (UID, DateTime))');
 
-  db.run('CREATE TABLE IF NOT EXISTS weights ' + 
+  db.run('CREATE TABLE IF NOT EXISTS weights ' +
   	'(UID INTEGER NOT NULL, ' +
   	'DateTime DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, ' +
-  	'Weight REAL NOT NULL, ' + 
+  	'Weight REAL NOT NULL, ' +
+  	'PRIMARY KEY (UID, DateTime))');
+
+});
+
+dbTest.serialize(function() {
+  dbTest.run('CREATE TABLE IF NOT EXISTS users ' +
+  	'(UID INTEGER PRIMARY KEY AUTOINCREMENT, ' +
+  	'LastName varchar(255) NOT NULL, ' +
+  	'FirstName varchar(255) NOT NULL, ' +
+  	'Username varchar(255) NOT NULL, ' +
+  	'Password varchar(255) NOT NULL)');
+
+  dbTest.run('CREATE TABLE IF NOT EXISTS photos ' +
+  	'(UID INTEGER NOT NULL, ' +
+  	'DateTime DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, ' +
+  	'FilePath varchar(255) NOT NULL, ' +
+  	'PRIMARY KEY (UID, DateTime))');
+
+  dbTest.run('CREATE TABLE IF NOT EXISTS weights ' +
+  	'(UID INTEGER NOT NULL, ' +
+  	'DateTime DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, ' +
+  	'Weight REAL NOT NULL, ' +
   	'PRIMARY KEY (UID, DateTime))');
 
 });
@@ -28,13 +51,29 @@ db.serialize(function() {
 function formatDateTime(datetime){
 	return dateFormat(datetime, "yyyy-mm-dd_hh-MM-ss");
 }
- 
+
 function savePhoto(uid, datetime, filepath){
 	var stmt = db.prepare('INSERT INTO photos(UID, DateTime, FilePath) VALUES (?, ?, ?)');
 	stmt.run(uid, datetime, filepath);
 	stmt.finalize();
 }
 db.savePhoto = savePhoto;
+
+function getLastImages(uid, numImages, callback){
+	db.all("SELECT * FROM photos WHERE UID = " + uid + " ORDER BY DateTime DESC",  function (err, results){
+        if(err){
+            console.log(err);
+        }else{
+        	if(results.length < numImages){
+        		callback(results.slice(0, results.length));
+        	}else{
+         		callback(results.slice(0,numImages));
+
+        	}
+        }
+      });
+}
+db.getLastImages = getLastImages;
 
 function saveWeight(uid, datetime, weight){
 	var stmt = db.prepare('INSERT INTO weights(UID, DateTime, Weight) VALUES (?, ?, ?)');
@@ -52,6 +91,7 @@ function getPreviousWeight(uid){
     }
   });
 }
+db.getPreviousWeight = getPreviousWeight;
 
 function checkLoginDetails(username, password, callback){
   db.all("SELECT UID FROM Users WHERE Username = " + username + " AND Password = " + password, function(err, results){
@@ -67,6 +107,5 @@ function checkLoginDetails(username, password, callback){
   });
 }
 db.checkLoginDetails = checkLoginDetails;
-
 
 module.exports = db;
