@@ -1,4 +1,4 @@
-package mirrormirror.swen302.mirrormirrorandroid;
+package mirrormirror.swen302.mirrormirrorandroid.utilities;
 
 import android.app.Activity;
 import android.content.Context;

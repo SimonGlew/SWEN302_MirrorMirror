@@ -59,6 +59,14 @@ io.on('connection', function(socket) {
 		db.saveWeight(uid, new Date(), weight);
 	});
 
+	socket.on(requestImages, function(data) {
+		var uid = data.uid;
+		var numImages = data.numImages;
+		var images = db.getLastImages(uid, numImages, function(results) {
+			//TODO socket.emit();
+		});
+	});
+
 });
 
 function saveImage(imageString, uid, datetime) {

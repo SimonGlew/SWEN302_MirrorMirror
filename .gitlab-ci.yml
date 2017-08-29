@@ -1,29 +1,56 @@
-# This file is a template, and might need editing before it works on your project.
-# Official framework image. Look for the different tagged releases at:
-# https://hub.docker.com/r/library/node/tags/
-image: node:latest
+image: openjdk:8-jdk
+image: node:latest 
 
-# Pick zero or more services to be used on all builds.
-# Only needed when using a docker container to run your tests in.
-# Check out: http://docs.gitlab.com/ce/ci/docker/using_docker_images.html#what-is-a-service
-services:
-  - mysql:latest
-  - redis:latest
-  - postgres:latest
+variables:
+  ANDROID_COMPILE_SDK: "25"
+  ANDROID_BUILD_TOOLS: "25.0.2"
+  ANDROID_SDK_TOOLS: "26.0.2"
 
-# This folder is cached between builds
-# http://docs.gitlab.com/ce/ci/yaml/README.html#cache
 cache:
   paths:
-  - node_modules/
+   - node_modules/
+   - .gradle/wrapper
+   - .gradle/gradle/caches
+   - .gradle/gradle/build-cache
+   - android-sdk-linux/
 
-test_async:
+  
+before_script:
+  - echo 'Starting test'
+  - echo 'finish setting up enviroment variables'
+  - export ANDROID_HOME=$PWD/android-sdk-linux
+  - export PATH=$PATH:$PWD/android-sdk-linux/platform-tools/
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+
+  
+stages:
+  - echo 'starting stages'
+  - build_node
+  - build_android
+  - test_android
+  
+build_node:
+  stage: build_node
   script:
-   - npm install
-   - node ./specs/start.js ./specs/async.spec.js
-
-
-test_db:
+    - echo 'Starting gulp build'
+    - cd WebApplication/
+    - npm install
+    - npm install gulp
+    - gulp build
+    - echo "Start Testing"
+    - npm run test
+   
+build_android:
+  stage: build_android
   script:
-   - npm install
-   - node ./specs/start.js ./specs/db-postgres.spec.js
+    - ./gradlew assembleDebug
+  artifacts:
+    paths:
+    - AndroidApplication/MirrorMirrorAndroid/app/build/outputs/
+
+test_android:
+  stage: test_android
+  dependencies:
+    - build_android
+  script:
+    - ./gradlew test_android
