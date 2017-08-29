@@ -47,6 +47,7 @@ import mirrormirror.swen302.mirrormirrorandroid.activities.CameraPreviewActivity
 import mirrormirror.swen302.mirrormirrorandroid.adapters.HorizontalAdapter;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.DateTimeManager;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.ImageStorageManager;
+import mirrormirror.swen302.mirrormirrorandroid.utilities.InputWeightDialog;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.ServerController;
 
 /**
@@ -126,7 +127,12 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         if(item.getItemId() == R.id.take_image){
             Intent intent = new Intent(this, CameraPreviewActivity.class);
             startActivityForResult(intent, CAMERA_ACTIVITY_REQUEST_CODE);
-        } else if (drawerToggle.onOptionsItemSelected(item)) {
+        } else if(item.getItemId() == R.id.input_weight){
+            //Popup weight input dialog
+            InputWeightDialog iwd = new InputWeightDialog(this);
+            iwd.show();
+        }
+        else if (drawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
         return super.onOptionsItemSelected(item);
