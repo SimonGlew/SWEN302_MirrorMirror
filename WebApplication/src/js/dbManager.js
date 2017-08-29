@@ -43,20 +43,30 @@ function saveWeight(uid, datetime, weight){
 }
 db.saveWeight = saveWeight;
 
-function getLastImages(uid, numImages, callback){
-	db.all("SELECT * FROM photos WHERE UID = " + uid + " ORDER BY DateTime DESC",  function (err, results){
-        if(err){
-            console.log(err);
-        }else{
-        	if(results.length < numImages){
-        		callback(results.slice(0, results.length));
-        	}else{
-         		callback(results.slice(0,numImages));
-        	
-        	}
-        }
-    });
+function getPreviousWeight(uid){
+  db.all("SELECT datetime, weight FROM weights WHERE DateTime BETWEEN datetime('now','-6 days') AND datetime('now', 'localtime') AND uid = " + uid + " ORDER BY DateTime DESC", function(err, results){
+    if(err){
+      console.log(err);
+    }else{
+      return results;
+    }
+  });
 }
-db.getLastImages = getLastImages; 
+
+function checkLoginDetails(username, password, callback){
+  db.all("SELECT UID FROM Users WHERE Username = " + username + " AND Password = " + password, function(err, results){
+    if(err){
+      console.log(err);
+    }else{
+      if(results.length == 0){
+        callback(null);
+      }else{
+        callback(results[0]);
+      }
+    }
+  });
+}
+db.checkLoginDetails = checkLoginDetails;
+
 
 module.exports = db;

@@ -12,7 +12,9 @@ var port = 3000;
 
 var imageEvent = 'image event';
 var weightEvent = 'weight event';
-var requestImages = 'request images';
+var loginEvent = 'login event';
+var loginSuccessEvent = 'login success event';
+var previousWeightsEvent = 'previous weight event';
 
 server.listen(port, function() {
 	console.log('Listening on port ' + port);
@@ -25,7 +27,24 @@ app.use('/', router);
 io.on('connection', function(socket) {
 
 	console.log('device connection, with id: ' + socket.id);
-	//TODO: SEND UID TO DEVICE
+
+	socket.on(loginEvent, function(data){
+		var username = data.username;
+		var password = data.password;
+
+		db.checkLoginDetails(username, password, function(results){
+			if(results != null){
+				socket.emit(loginSuccessEvent, { uid : results.uid});
+			}
+		});
+	});
+
+	socket.on(previousWeightsEvent, function(data){
+		var uid = data.uid;
+		db.getPreviousWeights(uid, function(results){
+			//past 7 days of weights, could have more than 1 per day, has rows of (datetime, weight)
+		});
+	});
 
 	socket.on(imageEvent, function(data) {
 		var uid = data.uid;
