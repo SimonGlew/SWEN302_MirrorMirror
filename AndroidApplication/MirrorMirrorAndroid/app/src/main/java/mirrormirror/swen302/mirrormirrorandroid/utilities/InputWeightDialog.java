@@ -10,8 +10,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.NumberPicker;
 import android.widget.Spinner;
+
+import com.shawnlin.numberpicker.NumberPicker;
 
 import java.text.DecimalFormat;
 
@@ -36,18 +37,16 @@ public class InputWeightDialog extends AlertDialog implements View.OnClickListen
     }
 
     void populateSpinnerAdapters(){
-        String[] leftAdapterVals = new String[maxWeight]; //KG spinner
         String[] rightAdapterVals = new String[(int)(1/subKGStepping)]; //Sub-KG spinner
-        for(int n = 0; n < maxWeight; n++){
-            leftAdapterVals[n] = Integer.toString(n);
-        }
         for(int n = 0; n < (int)(1/subKGStepping); n++){
             rightAdapterVals[n] = dF.format(subKGStepping*n);
         }
         leftPicker = (NumberPicker) findViewById(R.id.weight_picker_left);
         rightPicker = (NumberPicker) findViewById(R.id.weight_picker_right);
-        //leftPicker.setDisplayedValues(leftAdapterVals);
-        //rightPicker.setDisplayedValues(rightAdapterVals);
+        leftPicker.setMaxValue(maxWeight);
+        leftPicker.setMinValue(1);
+        rightPicker.setMinValue(0);
+        rightPicker.setMaxValue(9);
     }
 
     @Override
@@ -55,7 +54,7 @@ public class InputWeightDialog extends AlertDialog implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.input_weight_dialog);
 
-        //populateSpinnerAdapters();
+        populateSpinnerAdapters();
         Button cancel = (Button) findViewById(R.id.cancel_button);
         Button submit = (Button) findViewById(R.id.submit_button);
         cancel.setOnClickListener(this);
@@ -67,8 +66,9 @@ public class InputWeightDialog extends AlertDialog implements View.OnClickListen
         if(v.getId() == R.id.cancel_button){
             cancel();
         } else if(v.getId() == R.id.submit_button){
-//            int test = leftPicker.getValue()+rightPicker.getValue();
-//            ServerController.sendWeight(test, DateTimeManager.getDatetimeAsString(), getContext());
+            float weightVal = leftPicker.getValue();
+            weightVal += (rightPicker.getValue())/((int)(1/subKGStepping));
+            ServerController.sendWeight(weightVal, DateTimeManager.getDatetimeAsString(), getContext());
             cancel();
         }
     }
