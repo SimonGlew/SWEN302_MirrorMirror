@@ -3,10 +3,12 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var path = require('path');
-var fs = require('file-system');
+var filesystem = require('file-system');
+var fs = require('fs');
 
 var router = require('./src/js/router');
-var db = require('./src/js/dbManager');
+
+var db = require('./src/js/dbManager')('MirrorMirror');
 
 var port = 3000;
 
@@ -15,6 +17,8 @@ var weightEvent = 'weight event';
 var loginEvent = 'login event';
 var loginSuccessEvent = 'login success event';
 var previousWeightsEvent = 'previous weight event';
+var requestImages = 'request last images event';
+var requestImagesSuccess = 'request last images success event';
 
 server.listen(port, function() {
 	console.log('Listening on port ' + port);
@@ -34,7 +38,7 @@ io.on('connection', function(socket) {
 
 		db.checkLoginDetails(username, password, function(results){
 			if(results != null){
-				socket.emit(loginSuccessEvent, { uid : results.uid});
+				socket.emit(loginSuccessEvent, { 'uid' : results.uid});
 			}
 		});
 	});
@@ -43,6 +47,8 @@ io.on('connection', function(socket) {
 		var uid = data.uid;
 		db.getPreviousWeights(uid, function(results){
 			//past 7 days of weights, could have more than 1 per day, has rows of (datetime, weight)
+			var dataToSend = [];
+
 		});
 	});
 
@@ -56,6 +62,7 @@ io.on('connection', function(socket) {
 	socket.on(weightEvent, function(data) {
 		var uid = data.uid;
 		var weight = data.weight;
+		console.log('test123');
 		db.saveWeight(uid, new Date(), weight);
 	});
 
@@ -63,21 +70,31 @@ io.on('connection', function(socket) {
 		var uid = data.uid;
 		var numImages = data.numImages;
 		var images = db.getLastImages(uid, numImages, function(results) {
-			//TODO socket.emit();
+			var dataToSend = [];
+			for(index = 0; index < results.length; index++){
+				var imageString = getStringFromImage(results[index].FilePath);
+				var time = results[index].DateTime;
+
+				dataToSend.push({ 'imageString' : imageString, 'time' : time });
+			}
+			socket.emit(requestImagesSuccess, { 'data' : dataToSend});
 		});
 	});
 
 });
 
 function saveImage(imageString, uid, datetime) {
-	//TODO: GET UID FROM DEVICE
-
 	var filepath = './public/images/' + uid + '_' + datetime + '.jpg';
 	var bitmap = new Buffer(imageString, 'base64');
 	//Save Photo to filepath
-	fs.writeFileSync(filepath, bitmap);
+	filesystem.writeFileSync(filepath, bitmap);
 	//Record filepath in database
 	db.savePhoto(uid, datetime, filepath);
+};
+
+function getStringFromImage(filepath){
+	var bitmap = fs.readFileSync(filepath);
+	return new Buffer(bitmap).toString('base64');
 };
 
 function getCurrentDate() {
