@@ -19,6 +19,7 @@ var loginSuccessEvent = 'login success event';
 var requestLastImages = 'request last images event';
 var requestImages = 'request images event'
 var requestWeights = 'request weights event'
+var requestWeightsSuccess = 'request weights success event'
 var requestLastImagesSuccess = 'request last images success event';
 var requestImagesSuccess = 'request images success event'
 var requestWeightsSuccess = 'request weights success event'
@@ -57,7 +58,7 @@ io.on('connection', function(socket) {
 			var prevDay = results[0].datetime.getDate();
 			var dayWeight = 0;
 			var countOfWeights = 0;
-			for(int i = 0; i < results.length; i++){
+			for(var i = 0; i < results.length; i++){
 				var event = results[i];
 
 				if(event.datetime.getDate() == prevDay.getDate()){

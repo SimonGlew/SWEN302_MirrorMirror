@@ -33,21 +33,4 @@ describe('DBTests', function(){
       });
     });
   });
-
-
-
-
-    //
-    // db.run('DELETE FROM Users', function(){
-    //   db.get('SELECT COUNT(*) from Users', function(err, result){
-    //     expect(result['COUNT(*)'] == 0);
-    //   });
-    // });
-    // db.run('DELETE FROM Photos', function(){
-    //   db.get('SELECT COUNT(*) from Photos', function(err, result){
-    //     expect(result['COUNT(*)'] == 0);
-    //   });
-    // });
-
-
 });
