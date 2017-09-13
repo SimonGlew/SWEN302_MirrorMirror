@@ -20,6 +20,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,6 +35,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -66,6 +70,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     HorizontalAdapter horizontalAdapter;
 
     List<String> filePaths;
+    boolean isLoadingImages;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -80,7 +85,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         setupDrawerLayout();
 
         initialLoadImages();
-        setRecyclerView();
+
     }
 
     private void setupDrawerLayout(){
@@ -107,11 +112,26 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private void setRecyclerView(){
         recyclerView = (RecyclerView)findViewById(R.id.horizontal_recycler_view);
         horizontalAdapter = new HorizontalAdapter(filePaths,this);
-        LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        final LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(horizontalLayoutManager);
         recyclerView.setAdapter(horizontalAdapter);
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                int visibleItemCount = horizontalLayoutManager.getChildCount();
+                int totalItemCount = horizontalLayoutManager.getItemCount();
+                int pastVisible = horizontalLayoutManager.findFirstVisibleItemPosition();
+                if(pastVisible + visibleItemCount >= totalItemCount && !isLoadingImages){
+                    isLoadingImages = true;
+                    ServerController.sendImageAdditionsRequest(HomeActivity.this, 5, totalItemCount);
+                }
+            }
+        });
     }
 
+    private void setSocketListeners(){
+        ServerController.setSocketListeners(this);
+    }
 
     private void hideKeyboard(){
         View view = this.getCurrentFocus();
@@ -152,10 +172,11 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     private void initialLoadImages(){
         File[] files = getFilesDir().listFiles();
-        filePaths = new ArrayList<>(files.length);
+
         for(int i = files.length-1; i >= 0; i --){
             filePaths.add(files[i].getName());
         }
+        ServerController.sendImagesRequest(this, 5);
     }
 
     private void loadImages(){
@@ -163,7 +184,52 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         for(int i = filePaths.size(); i < files.length; i ++){
             filePaths.add(0,files[i].getName());
         }
-        recyclerView.getAdapter().notifyDataSetChanged();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                recyclerView.getAdapter().notifyDataSetChanged();
+
+            }
+        });
+
+
+    }
+
+    public void loadInitialImagesFromServer(JSONArray images){
+        for(int i = 0; i < images.length(); i++){
+            try {
+                JSONObject object = images.getJSONObject(i);
+                String bytesString = object.getString("imageString");
+                String time = object.getString("time");
+                ImageStorageManager.storeImage(time, Base64.decode(bytesString, Base64.DEFAULT), this);
+                loadImages();
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+        //loadImages();
+        if(filePaths.size() < 10){
+            ServerController.sendImageAdditionsRequest(this, 5, filePaths.size());
+        }
+
+
+    }
+
+    public void loadMoreImages(JSONArray images){
+        for(int i = 0; i < images.length(); i++){
+            try {
+                JSONObject object = images.getJSONObject(i);
+                String bytesString = object.getString("imageString");
+                String time = object.getString("time");
+                ImageStorageManager.storeImage(time, Base64.decode(bytesString, Base64.DEFAULT), this);
+                loadImages();
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+        isLoadingImages = false;
     }
 
     //React to items selected within the sidebar.

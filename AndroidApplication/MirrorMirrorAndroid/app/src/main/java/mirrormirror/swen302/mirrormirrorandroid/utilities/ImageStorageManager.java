@@ -30,12 +30,13 @@ public class ImageStorageManager {
         }
     }
 
-    public static Bitmap loadImageByName(String fileName, Context context){
+    public static byte[] loadImageByName(String fileName, Context context){
         try{
             FileInputStream fis = context.openFileInput(fileName);
-            Bitmap image = BitmapFactory.decodeStream(fis);
+            byte[] bytes = new byte[fis.available()];
+            fis.read(bytes);
             fis.close();
-            return  image;
+            return bytes;
 
         }catch(Exception e){
 
