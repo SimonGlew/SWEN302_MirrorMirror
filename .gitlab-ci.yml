@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 image: openjdk:8-jdk
 image: node:latest 
 
@@ -5,6 +6,9 @@ variables:
   ANDROID_COMPILE_SDK: "25"
   ANDROID_BUILD_TOOLS: "25.0.2"
   ANDROID_SDK_TOOLS: "26.0.2"
+=======
+image: node:latest 
+>>>>>>> 816cd4dad555653e5c3f01c020cdc3bb1abe7fbd
 
 cache:
   paths:
