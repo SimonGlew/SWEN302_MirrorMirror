@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 import mirrormirror.swen302.mirrormirrorandroid.R;
@@ -27,6 +29,7 @@ public class HorizontalAdapter extends RecyclerView.Adapter {
         this.filePaths = filePaths;
         this.context = context;
     }
+
 
     public class ImageViewHolder extends RecyclerView.ViewHolder {
 
@@ -49,18 +52,28 @@ public class HorizontalAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         ImageViewHolder imageHolder = (ImageViewHolder)holder;
-        imageHolder.imageView.setImageBitmap(ImageStorageManager.loadImageByName(filePaths.get(position), context));
+        //imageHolder.imageView.setImageBitmap(ImageStorageManager.loadImageByName(filePaths.get(position), context));
+        Glide.with(context).load(ImageStorageManager.loadImageByName(filePaths.get(position), context)).into(imageHolder.imageView);
         imageHolder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ImageView mainImage = (ImageView)HorizontalAdapter.this.context.findViewById(R.id.main_image);
-                mainImage.setImageBitmap(ImageStorageManager.loadImageByName(filePaths.get(position), context));
+                Glide.with(context).load(ImageStorageManager.loadImageByName(filePaths.get(position),context)).into(mainImage);
+                //mainImage.setImageBitmap(ImageStorageManager.loadImageByName(filePaths.get(position), context));
             }
         });
     }
 
+
+
     @Override
     public int getItemCount() {
-        return filePaths.size();
+        if(filePaths != null){
+            return filePaths.size();
+
+        }
+        else{
+            return 0;
+        }
     }
 }
