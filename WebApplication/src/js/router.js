@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var db = require('./dbManager');
+var db = require('./dbManager')('MirrorMirror');
 
 router.get('/', function(req, res) {
 	db.getLastImages(3, 1, function(result){
