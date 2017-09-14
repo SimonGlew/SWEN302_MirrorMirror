@@ -20,8 +20,8 @@ before_script:
   - echo 'Starting test'
   - export ANDROID_HOME=$PWD/android-sdk-linux
   - export PATH=$PATH:$PWD/android-sdk-linux/platform-tools/
-  - export GRADLE_USER_HOME=`pwd`/.gradle
-  - chmod +x ./gradlew
+  - export GRADLE_USER_HOME=`pwd`./AndroidApplication/MirrorMirror/Android/gradle
+  - chmod +x ./AndroidApplication/MirrorMirror/Android/gradlew
   - echo 'finish setting up enviroment variables'
   
 stages:
@@ -43,7 +43,7 @@ build_node:
 build_android:
   stage: build_android
   script:
-    #- ./gradlew assemble
+    #- ./AndroidApplication/MirrorMirror/Android/gradlew assemble
     - echo 'PLZ'
   artifacts:
     paths:
