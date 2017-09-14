@@ -1,12 +1,13 @@
 var express = require('express');
 var router = express.Router();
+var db = require('./dbManager')('MirrorMirror');
 
 router.get('/', function(req, res) {
-
-
-
-	res.render('index', {
-		photos: photos
+	db.getLastImages(3, 1, function(result){
+		console.log(result[0]);
+		res.render('index', {
+			photo: result[0]
+		});
 	});
 });
 
