@@ -6,10 +6,13 @@ function formatDateTime(datetime){
 	return dateFormat(datetime, "yyyy-mm-dd_hh-MM-ss");
 }
 
-function savePhoto(uid, datetime, filepath){
+function savePhoto(uid, datetime, filepath, callback){
 	var stmt = db.prepare('INSERT INTO photos(UID, DateTime, FilePath) VALUES (?, ?, ?)');
 	stmt.run(uid, datetime, filepath);
 	stmt.finalize();
+	if(callback){
+		callback();
+	}
 }
 
 function getImages(uid, numImages, offset, callback){
@@ -28,26 +31,14 @@ function getImages(uid, numImages, offset, callback){
 	});
 }
 
-/*function getLastImages(uid, numImages, callback){
-	db.all("SELECT * FROM photos WHERE UID = " + uid + " ORDER BY DateTime DESC",  function (err, results){
-		if(err){
-			console.log(err);
-		}else{
-			if(results.length < numImages){
-				callback(results.slice(0, results.length));
-			}else{
-				callback(results.slice(0,numImages));
-
-			}
-		}
-	});
-}*/
-
-function saveWeight(uid, datetime, weight){
+function saveWeight(uid, datetime, weight, callback){
 	weight = weight.toFixed(1);
 	var stmt = db.prepare('INSERT INTO weights(UID, DateTime, Weight) VALUES (?, ?, ?)');
 	stmt.run(uid, formatDateTime(datetime), weight);
 	stmt.finalize();
+	if(callback){
+		callback();
+	}
 }
 
 function getPreviousWeights(uid, numDays, callback){
@@ -55,6 +46,7 @@ function getPreviousWeights(uid, numDays, callback){
 		if(err){
 			console.log(err);
 		}else{
+			var weightCounts = [];
 			callback(results);
 		}
 	});
@@ -74,7 +66,7 @@ function checkLoginDetails(username, password, callback){
 	});
 }
 
-function openDatabase(dbname){
+function openDatabase(dbname, callback){
 	db = new sqlite3.Database(dbname);
 	require('fs').readFile('./databaseCreatorScript.sql', function(err, script){
 		if(err){
@@ -91,7 +83,9 @@ function openDatabase(dbname){
 	db.getImages = getImages;
 	db.checkLoginDetails = checkLoginDetails;
 	db.getPreviousWeights = getPreviousWeights;
-
+	if(callback){
+		callback();
+	}
 	return db;
 }
 
