@@ -78,22 +78,20 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_activity);
 
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         navView = (NavigationView) findViewById(R.id.nav_view);
         navView.setNavigationItemSelectedListener(this);
         ActionBar titleBar = getSupportActionBar();
         titleBar.setDisplayHomeAsUpEnabled(true);
-
-        setupDrawerLayout();
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open, R.string.drawer_close);
+        drawerLayout.addDrawerListener(drawerToggle);
+        filePaths = new ArrayList<>();
+        isLoadingImages = false;
+        setRecyclerView();
+        setSocketListeners();
 
         initialLoadImages();
 
-    }
-
-    private void setupDrawerLayout(){
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-
-        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open, R.string.drawer_close);
-        drawerLayout.addDrawerListener(drawerToggle);
     }
 
     @Override
@@ -240,21 +238,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        Intent weightIntent = new Intent(HomeActivity.this, WeightGraphActivity.class);
-        if(id == R.id.weight7days){
-            weightIntent.putExtra("numDays", 7);
-        }else if(id == R.id.weight30days){
-            System.out.println("30");
-            weightIntent.putExtra("numDays", 30);
-        }else if(id == R.id.weight180days){
-            System.out.println("180");
-            weightIntent.putExtra("numDays", 180);
-        }else if(id == R.id.weight365days){
-            System.out.println("365");
-            weightIntent.putExtra("numDays", 365);
-        }
-        HomeActivity.this.startActivity(weightIntent);
-
+        //if(id == R.id.drawer_placeholder1)...
         return true;
     }
 
