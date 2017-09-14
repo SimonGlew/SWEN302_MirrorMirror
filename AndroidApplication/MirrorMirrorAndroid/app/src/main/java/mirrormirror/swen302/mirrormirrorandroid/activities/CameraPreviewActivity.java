@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.CountDownTimer;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -48,7 +49,7 @@ public class CameraPreviewActivity extends AppCompatActivity {
     }
 
     private void beginCameraSession() {
-        PermissionRequester.requestCameraPermission(this);
+
         PermissionRequester.requestInternetPermission(this);
         frontCamera = CameraDispatcher.getCameraInstance();
         frontCameraPreview = new CameraPreview(this, frontCamera);
@@ -65,6 +66,7 @@ public class CameraPreviewActivity extends AppCompatActivity {
         });
 
     }
+
 
     private void beginCameraCountdown(){
         CountDownTimer timer = new CountDownTimer(4000, 1000) {
@@ -103,7 +105,6 @@ public class CameraPreviewActivity extends AppCompatActivity {
         setResult(RESULT_OK, resultData);
         finish();
     }
-
 
 
 
