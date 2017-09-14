@@ -234,7 +234,20 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        //if(id == R.id.drawer_placeholder1)...
+        Intent weightIntent = new Intent(HomeActivity.this, WeightGraphActivity.class);
+        if(id == R.id.weight7days){
+            weightIntent.putExtra("numDays", 7);
+        }else if(id == R.id.weight30days){
+            System.out.println("30");
+            weightIntent.putExtra("numDays", 30);
+        }else if(id == R.id.weight180days){
+            System.out.println("180");
+            weightIntent.putExtra("numDays", 180);
+        }else if(id == R.id.weight365days){
+            System.out.println("365");
+            weightIntent.putExtra("numDays", 365);
+        }
+        HomeActivity.this.startActivity(weightIntent);
         return true;
     }
 
