@@ -3,11 +3,17 @@ package mirrormirror.swen302.mirrormirrorandroid.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.GridLabelRenderer;
 import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.DataPointInterface;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.jjoe64.graphview.series.OnDataPointTapListener;
+import com.jjoe64.graphview.series.Series;
 
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,6 +34,7 @@ import mirrormirror.swen302.mirrormirrorandroid.utilities.ServerController;
 public class WeightGraphActivity extends AppCompatActivity {
 
     private int numDays = 0;
+    private SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -46,17 +53,38 @@ public class WeightGraphActivity extends AppCompatActivity {
         //ServerController.getWeights(numDays, this);
         GraphView graph = (GraphView) findViewById(R.id.graph);
 
+        graph.getViewport().setXAxisBoundsManual(true);
+        graph.getViewport().setMinX(1);
+        graph.getViewport().setMaxX(numDays + 1);
+
         LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(generateData());
 
-        series.setTitle("Previous " + numDays + " days");
+        GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
+        gridLabel.setHorizontalAxisTitle("Number of Days away from " + format.format(new Date()));
+        gridLabel.setVerticalAxisTitle("Weight (kg)");
+        gridLabel.setVerticalAxisTitleTextSize(20);
+        gridLabel.setHorizontalAxisTitleTextSize(20);
+        graph.setTitle("Previous " + numDays + " days");
+        graph.setTitleTextSize(50);
+
         series.setColor(getResources().getColor(R.color.colorAccent));
         series.setDrawDataPoints(true);
-        series.setDataPointsRadius(10);
+        series.setDataPointsRadius(5);
+
+        series.setOnDataPointTapListener(new OnDataPointTapListener() {
+            @Override
+            public void onTap(Series series, DataPointInterface dataPoint) {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(new Date());
+                cal.add(Calendar.DATE, (int)(- dataPoint.getX()));
+                Toast.makeText(WeightGraphActivity.this, "On " + format.format(cal.getTime()) + ", you weighed: " +
+                        dataPoint.getY() + "kgs", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         graph.addSeries(series);
 
-        graph.getViewport().setMinX(numDays);
-        graph.getViewport().setMaxX(numDays);
+
 
     }
 
@@ -68,12 +96,12 @@ public class WeightGraphActivity extends AppCompatActivity {
         DecimalFormat df = new DecimalFormat("#.#");
 
         DataPoint[] dataPoints = new DataPoint[numDays];
-        for(int i = 0; i < numDays; i ++) {
+        for(int i = 1; i <= numDays; i ++) {
 
             double weight = (min + (max - min) * r.nextDouble());
 
             DataPoint d = new DataPoint(i, Double.parseDouble(df.format(weight)));
-            dataPoints[i] = d;
+            dataPoints[i -1] = d;
         }
         return dataPoints;
     }

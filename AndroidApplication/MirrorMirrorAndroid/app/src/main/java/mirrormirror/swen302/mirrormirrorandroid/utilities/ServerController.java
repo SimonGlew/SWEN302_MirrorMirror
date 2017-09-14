@@ -64,6 +64,22 @@ public class ServerController {
         socket.emit("weight event", messageObject);
     }
 
+    public static void sendWeightsRequest(Context context, int numberOfWeights){
+        Socket socket = SocketSingleton.getInstance(context).getSocket();
+        if(!socket.connected()){
+            socket.connect();
+        }
+
+        JSONObject messageObject = new JSONObject();
+        try{
+            messageObject.put("uid", 3);
+            messageObject.put("numDays", numberOfWeights);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        socket.emit("request weights event", messageObject);
+    }
+
     public static void sendImagesRequest(Context context, int numberOfImages){
         Socket socket = SocketSingleton.getInstance(context).getSocket();
         if(!socket.connected()) {
@@ -110,6 +126,18 @@ public class ServerController {
         Emitter.Listener onAdditionImagesMessage = createNewAdditionImageListener(context);
         socket.on("request images success event", onAdditionImagesMessage);
 
+        Emitter.Listener onWeightMessage = createWeightGraphListener(context);
+        socket.on("request weights success event", onWeightMessage);
+    }
+
+    public static Emitter.Listener createWeightGraphListener(final HomeActivity homeActivity){
+        return new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                JSONArray jsonArray = (JSONArray)args[0];
+                homeActivity.makeWeightGraph(jsonArray);
+            }
+        };
     }
 
     public static Emitter.Listener createNewImageListener(final HomeActivity homeActivity){
