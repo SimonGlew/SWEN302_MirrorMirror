@@ -171,7 +171,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private void initialLoadImages(){
         File[] files = getFilesDir().listFiles();
 
-        for(int i = files.length-1; i >= 0; i --){
+        for(int i = 0; i < files.length; i ++){
             filePaths.add(files[i].getName());
         }
         ServerController.sendImagesRequest(this, 5);
@@ -180,7 +180,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private void loadImages(){
         File[] files = getFilesDir().listFiles();
         for(int i = filePaths.size(); i < files.length; i ++){
-            filePaths.add(0,files[i].getName());
+            filePaths.add(files[i].getName());
         }
         runOnUiThread(new Runnable() {
             @Override
