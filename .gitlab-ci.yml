@@ -1,4 +1,6 @@
+
 image: node:latest
+
 image: openjdk:8-jdk
 
 variables:
