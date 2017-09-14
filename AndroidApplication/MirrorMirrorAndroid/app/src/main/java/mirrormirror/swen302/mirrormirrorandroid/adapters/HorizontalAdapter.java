@@ -8,6 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+
+import com.bumptech.glide.Glide;
 
 import java.util.List;
 
@@ -22,17 +25,25 @@ public class HorizontalAdapter extends RecyclerView.Adapter {
 
     public List<String> filePaths;
     Activity context;
+    LinearLayout highlightedPath;
+    int highlightedPosition;
 
     public HorizontalAdapter(List<String> filePaths, Activity context){
         this.filePaths = filePaths;
         this.context = context;
+        this.highlightedPath = null;
+        this.highlightedPosition = -1;
+
     }
+
 
     public class ImageViewHolder extends RecyclerView.ViewHolder {
 
         ImageView imageView;
+        LinearLayout imageViewParent;
         public ImageViewHolder(View view) {
             super(view);
+            imageViewParent = (LinearLayout) view.findViewById(R.id.recycler_imageview_parent);
             imageView=(ImageView) view.findViewById(R.id.recycler_imageview);
         }
     }
@@ -47,20 +58,48 @@ public class HorizontalAdapter extends RecyclerView.Adapter {
 
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
-        ImageViewHolder imageHolder = (ImageViewHolder)holder;
-        imageHolder.imageView.setImageBitmap(ImageStorageManager.loadImageByName(filePaths.get(position), context));
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
+        final ImageViewHolder imageHolder = (ImageViewHolder)holder;
+        final LinearLayout parent = (LinearLayout) imageHolder.imageViewParent;
+        //imageHolder.imageView.setImageBitmap(ImageStorageManager.loadImageByName(filePaths.get(position), context));
+        Glide.with(context).load(ImageStorageManager.loadImageByName(filePaths.get(position), context)).into(imageHolder.imageView);
+        if(position == highlightedPosition){
+            parent.setBackgroundColor(context.getResources().getColor(R.color.imageSelectedColor));
+        }
         imageHolder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ImageView mainImage = (ImageView)HorizontalAdapter.this.context.findViewById(R.id.main_image);
-                mainImage.setImageBitmap(ImageStorageManager.loadImageByName(filePaths.get(position), context));
+                Glide.with(context).load(ImageStorageManager.loadImageByName(filePaths.get(position),context)).into(mainImage);
+                parent.setBackgroundColor(context.getResources().getColor(R.color.imageSelectedColor));
+                if(highlightedPosition != -1 && highlightedPosition != position) {
+                    highlightedPath.setBackgroundColor(context.getResources().getColor(R.color.colorAccent));
+                }
+                highlightedPath = parent;
+                highlightedPosition = position;
+                //mainImage.setImageBitmap(ImageStorageManager.loadImageByName(filePaths.get(position), context));
+
             }
         });
     }
 
     @Override
+    public void onViewDetachedFromWindow(RecyclerView.ViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        final ImageViewHolder imageHolder = (ImageViewHolder)holder;
+
+        LinearLayout parent = (LinearLayout) imageHolder.imageViewParent;
+        parent.setBackgroundColor(context.getResources().getColor(R.color.colorAccent));
+    }
+
+    @Override
     public int getItemCount() {
-        return filePaths.size();
+        if(filePaths != null){
+            return filePaths.size();
+
+        }
+        else{
+            return 0;
+        }
     }
 }
