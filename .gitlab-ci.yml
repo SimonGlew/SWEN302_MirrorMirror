@@ -1,37 +1,40 @@
-<<<<<<< HEAD
+
+image: node:latest
+
 image: openjdk:8-jdk
-image: node:latest 
 
 variables:
   ANDROID_COMPILE_SDK: "25"
   ANDROID_BUILD_TOOLS: "25.0.2"
   ANDROID_SDK_TOOLS: "26.0.2"
-=======
-image: node:latest 
->>>>>>> 816cd4dad555653e5c3f01c020cdc3bb1abe7fbd
+
+variables:
+  ANDROID_COMPILE_SDK: "25"
+  ANDROID_BUILD_TOOLS: "25.0.2"
+  ANDROID_SDK_TOOLS: "26.0.2"
 
 cache:
+  untracked: true
   paths:
-   - node_modules/
-   - .gradle/wrapper
-   - .gradle/gradle/caches
-   - .gradle/gradle/build-cache
-   - android-sdk-linux/
+    - node_modules/
+    - .gradle/wrapper
+    - .gradle/caches
+    - .gradle/build-cache
+    - android-sdk-linux/
 
   
 before_script:
   - echo 'Starting test'
-  - echo 'finish setting up enviroment variables'
   - export ANDROID_HOME=$PWD/android-sdk-linux
   - export PATH=$PATH:$PWD/android-sdk-linux/platform-tools/
-  - export GRADLE_USER_HOME=`pwd`/.gradle
-
+  - export GRADLE_USER_HOME=`pwd`./AndroidApplication/MirrorMirrorAndroid/gradle
+  - chmod +x ./AndroidApplication/MirrorMirrorAndroid/gradlew
+  - echo 'finish setting up enviroment variables'
   
 stages:
   - echo 'starting stages'
   - build_node
   - build_android
-  - test_android
   
 build_node:
   stage: build_node
@@ -43,18 +46,12 @@ build_node:
     - gulp build
     - echo "Start Testing"
     - npm run test
-   
+
 build_android:
   stage: build_android
   script:
-    - ./gradlew assembleDebug
+    #- ./AndroidApplication/MirrorMirror/Android/gradlew assemble
+    - echo 'PLZ'
   artifacts:
     paths:
-    - AndroidApplication/MirrorMirrorAndroid/app/build/outputs/
-
-test_android:
-  stage: test_android
-  dependencies:
-    - build_android
-  script:
-    - ./gradlew test_android
+    - app/build/outputs/

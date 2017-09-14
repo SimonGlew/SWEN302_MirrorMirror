@@ -52,6 +52,7 @@ import mirrormirror.swen302.mirrormirrorandroid.adapters.HorizontalAdapter;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.DateTimeManager;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.ImageStorageManager;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.InputWeightDialog;
+import mirrormirror.swen302.mirrormirrorandroid.utilities.PermissionRequester;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.ServerController;
 
 /**
@@ -151,8 +152,11 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == R.id.take_image){
-            Intent intent = new Intent(this, CameraPreviewActivity.class);
-            startActivityForResult(intent, CAMERA_ACTIVITY_REQUEST_CODE);
+            //if has permission already will run here, else will be activated in onpermission result
+            if(PermissionRequester.requestCameraPermission(this)){
+                Intent intent = new Intent(this, CameraPreviewActivity.class);
+                startActivityForResult(intent, CAMERA_ACTIVITY_REQUEST_CODE);
+            }
         } else if(item.getItemId() == R.id.input_weight){
             //Popup weight input dialog
             InputWeightDialog iwd = new InputWeightDialog(this);
@@ -173,7 +177,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private void initialLoadImages(){
         File[] files = getFilesDir().listFiles();
 
-        for(int i = files.length-1; i >= 0; i --){
+        for(int i = 0; i < files.length; i ++){
             filePaths.add(files[i].getName());
         }
         ServerController.sendImagesRequest(this, 5);
@@ -182,7 +186,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private void loadImages(){
         File[] files = getFilesDir().listFiles();
         for(int i = filePaths.size(); i < files.length; i ++){
-            filePaths.add(0,files[i].getName());
+            filePaths.add(files[i].getName());
         }
         runOnUiThread(new Runnable() {
             @Override
@@ -252,6 +256,19 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         HomeActivity.this.startActivity(weightIntent);
 
         return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if(requestCode == PermissionRequester.CAMERA_PERMISSION_CONSTANT){
+            Intent intent = new Intent(this, CameraPreviewActivity.class);
+            startActivityForResult(intent, CAMERA_ACTIVITY_REQUEST_CODE);
+        }
+        else if(requestCode == PermissionRequester.INTERNET_PERMISSION_CONSTANT){
+
+        }
     }
 
 }
