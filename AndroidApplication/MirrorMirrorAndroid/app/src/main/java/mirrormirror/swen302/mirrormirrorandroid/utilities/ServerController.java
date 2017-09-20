@@ -136,6 +136,18 @@ public class ServerController {
 
         Emitter.Listener onWeightMessage = createWeightGraphListener(context);
         socket.on("request weights success event", onWeightMessage);
+
+        Emitter.Listener onConnection = createConnectionListener(context);
+        socket.on(Socket.EVENT_CONNECT, onConnection);
+    }
+
+    public static Emitter.Listener createConnectionListener(final HomeActivity homeActivity){
+        return new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                homeActivity.onConnection();
+            }
+        };
     }
 
     public static Emitter.Listener createWeightGraphListener(final HomeActivity homeActivity){
