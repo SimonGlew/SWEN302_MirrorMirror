@@ -117,6 +117,14 @@ public class ServerController {
         socket.emit("request images event", messageObject);
     }
 
+    public static void sendAndroidIdEvent(Context context){
+        Socket socket = SocketSingleton.getInstance(context).getSocket();
+        if(!socket.connected())
+            socket.connect();
+
+        socket.emit("android connection event");
+    }
+
     public static void setSocketListeners(HomeActivity context){
         Socket socket = SocketSingleton.getInstance(context).getSocket();
 
