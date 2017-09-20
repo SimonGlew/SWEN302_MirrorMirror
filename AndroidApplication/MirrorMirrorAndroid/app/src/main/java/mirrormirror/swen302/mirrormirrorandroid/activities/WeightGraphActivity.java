@@ -26,6 +26,7 @@ import java.util.Random;
 
 import mirrormirror.swen302.mirrormirrorandroid.R;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.ServerController;
+import mirrormirror.swen302.mirrormirrorandroid.utilities.Weight;
 
 /**
  * Created by glewsimo on 7/09/17.
@@ -43,10 +44,9 @@ public class WeightGraphActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         numDays = intent.getIntExtra("numDays", 0);
-        makeWeightGraph();
     }
 
-    private void makeWeightGraph(){
+    private void makeWeightGraph(List<Weight> weights){
         System.out.println(numDays);
         //Go get data
 
@@ -57,7 +57,7 @@ public class WeightGraphActivity extends AppCompatActivity {
         graph.getViewport().setMinX(1);
         graph.getViewport().setMaxX(numDays + 1);
 
-        LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(generateData());
+        LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(generateData(weights));
 
         GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
         gridLabel.setHorizontalAxisTitle("Number of Days away from " + format.format(new Date()));
@@ -88,20 +88,19 @@ public class WeightGraphActivity extends AppCompatActivity {
 
     }
 
-    public DataPoint[] generateData() {
-        double min = 72.0;
-        double max = 80.0;
-
-        Random r = new Random();
+    public DataPoint[] generateData(List<Weight> weights) {
         DecimalFormat df = new DecimalFormat("#.#");
 
-        DataPoint[] dataPoints = new DataPoint[numDays];
-        for(int i = 1; i <= numDays; i ++) {
+        DataPoint[] dataPoints = new DataPoint[weights.size()];
+        for(int i = 0; i < weights.size(); i ++) {
+            double weight = weights.get(i).getWeight();
 
-            double weight = (min + (max - min) * r.nextDouble());
+            long timeDiff = new Date().getTime() - weights.get(i).getDate().getTime();
+            double xValue = ((((timeDiff / 1000) / 60) / 60) / 24);
 
-            DataPoint d = new DataPoint(i, Double.parseDouble(df.format(weight)));
-            dataPoints[i -1] = d;
+
+            DataPoint d = new DataPoint(xValue, Double.parseDouble(df.format(weight)));
+            dataPoints[i] = d;
         }
         return dataPoints;
     }
