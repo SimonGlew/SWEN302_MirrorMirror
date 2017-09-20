@@ -42,7 +42,9 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -54,6 +56,7 @@ import mirrormirror.swen302.mirrormirrorandroid.utilities.ImageStorageManager;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.InputWeightDialog;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.PermissionRequester;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.ServerController;
+import mirrormirror.swen302.mirrormirrorandroid.utilities.Weight;
 
 /**
  * Created by bondkyal on 10/08/17.
@@ -234,24 +237,46 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         isLoadingImages = false;
     }
 
+    public void makeWeightGraph(JSONArray w){
+        List<Weight> weights = new ArrayList<Weight>();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd_hh-MM-ss");
+        for(int i = 0; i < w.length(); i++){
+            try{
+                JSONObject object = w.getJSONObject(i);
+                Date d = dateFormat.parse(object.getString("date"));
+                double weight = Double.parseDouble(object.getString("weight"));
+                weights.add(new Weight(weight, d));
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+
+    }
+
     //React to items selected within the sidebar.
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
+        int numberOfDays = 7;
         Intent weightIntent = new Intent(HomeActivity.this, WeightGraphActivity.class);
         if(id == R.id.weight7days){
             weightIntent.putExtra("numDays", 7);
         }else if(id == R.id.weight30days){
             System.out.println("30");
             weightIntent.putExtra("numDays", 30);
+            numberOfDays = 30;
         }else if(id == R.id.weight180days){
             System.out.println("180");
             weightIntent.putExtra("numDays", 180);
+            numberOfDays = 180;
         }else if(id == R.id.weight365days){
             System.out.println("365");
             weightIntent.putExtra("numDays", 365);
+            numberOfDays = 365;
         }
         HomeActivity.this.startActivity(weightIntent);
+        ServerController.sendWeightsRequest(this, numberOfDays);
+
         return true;
     }
 
