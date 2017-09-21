@@ -42,7 +42,7 @@ function saveWeight(uid, datetime, weight, callback){
 }
 
 function getPreviousWeights(uid, numDays, callback){
-	db.all("SELECT datetime, weight FROM weights WHERE DateTime BETWEEN datetime('now','-" + numDays + " days') AND datetime('now', 'localtime') AND uid = " + uid + " ORDER BY DateTime DESC", function(err, results){
+	db.all("SELECT datetime, weight FROM weights WHERE uid = " + uid, function(err, results){
 		if(err){
 			console.log(err);
 		}else{
