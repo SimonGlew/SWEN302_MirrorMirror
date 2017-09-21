@@ -7,7 +7,7 @@ var filesystem = require('file-system');
 var fs = require('fs');
 
 var router = require('./src/js/router');
-
+var parser = require('./src/js/parser');
 var db = require('./src/js/dbManager')('MirrorMirror');
 
 var port = 3000;
@@ -57,12 +57,12 @@ io.on('connection', function(socket) {
 
 	socket.on(androidConnection, function(data){
 		androidId = socket.id;
-		console.log("android connection on id " + androidId);
+		println("android connection on id " + androidId);
 	});
 
 	socket.on(piConnection, function(data){
 		piId = socket.id;
-		console.log("pi connection on id " + piId)
+		println("pi connection on id " + piId)
 	});
 
 	socket.on(requestWeights, function(data){
@@ -111,7 +111,7 @@ io.on('connection', function(socket) {
 	socket.on(imageEvent, function(data) {
 		println("New image event received");
 		var uid = data.uid;
-		var datetime = data.datetime;
+		var datetime = parser.toDatabaseDate(data.datetime);
 		var imageString = data.image;
 		saveImage(imageString, uid, datetime);
 	});
