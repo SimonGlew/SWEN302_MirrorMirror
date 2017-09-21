@@ -13,6 +13,8 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import com.jjoe64.graphview.series.OnDataPointTapListener;
 import com.jjoe64.graphview.series.Series;
 
+import org.joda.time.Days;
+
 import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -25,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import mirrormirror.swen302.mirrormirrorandroid.R;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.ServerController;
@@ -38,6 +41,9 @@ public class WeightGraphActivity extends AppCompatActivity {
 
     private int numDays = 0;
     private SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+
+    private double maxWeight = Double.MIN_VALUE;
+    private double minWeight = Double.MAX_VALUE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -63,9 +69,16 @@ public class WeightGraphActivity extends AppCompatActivity {
 
         graph.getViewport().setXAxisBoundsManual(true);
         graph.getViewport().setMinX(0);
-        graph.getViewport().setMaxX(numDays);
+        graph.getViewport().setMaxX(30);
+
+        graph.getViewport().setYAxisBoundsManual(true);
+        graph.getViewport().setMinY(minWeight);
+        graph.getViewport().setMaxY(maxWeight);
 
         graph.getViewport().setScrollable(true);
+        graph.getViewport().setScalableY(false);
+        graph.getViewport().setScrollableY(false);
+
 
         series.setColor(getResources().getColor(R.color.colorAccent));
         series.setThickness(7);
@@ -95,16 +108,22 @@ public class WeightGraphActivity extends AppCompatActivity {
         DataPoint[] dataPoints = new DataPoint[weights.size()];
         for(int i = 0; i < weights.size(); i ++) {
             double weight = weights.get(i).getWeight();
-
             long timeDiff = new Date().getTime() - weights.get(i).getDate().getTime();
-            double xValue = weights.size() - 1 - ((((timeDiff / 1000) / 60) / 60) / 24);
-            if(xValue < 0){
+            double dayDiff = TimeUnit.DAYS.convert(timeDiff, TimeUnit.MILLISECONDS);
+
+            if(weight > maxWeight) maxWeight = weight;
+            if(weight < minWeight) minWeight = weight;
+
+            System.out.println(dayDiff);
+            if(dayDiff < 0){
                 int z = 1;
+                System.out.println("Simon");
             }
 
 
-            DataPoint d = new DataPoint(xValue, Double.parseDouble(df.format(weight)));
-            dataPoints[weights.size() - 1 - i] = d;
+            DataPoint d = new DataPoint(dayDiff, Double.parseDouble(df.format(weight)));
+
+            dataPoints[i] = d;
         }
         return dataPoints;
     }
