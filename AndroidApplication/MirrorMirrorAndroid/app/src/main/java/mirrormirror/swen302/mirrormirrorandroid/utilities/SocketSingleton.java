@@ -14,7 +14,7 @@ import java.net.URISyntaxException;
 public class SocketSingleton {
 
     private static SocketSingleton instance;
-    private static final String SERVER_ADDRESS = "http://130.195.6.226:3000";
+    private static final String SERVER_ADDRESS = "http://130.195.6.76:3000";
     private Socket socket;
     private Context context;
 
@@ -35,16 +35,18 @@ public class SocketSingleton {
 
     public Socket getSocket(){
         if(!this.socket.connected()){
-            socket.connect();
+            return socket.connect();
+        }else{
+            return this.socket;
+
         }
-        return this.socket;
     }
 
     private SocketSingleton(Context context){
         this.context = context;
         try {
             this.socket = IO.socket(SERVER_ADDRESS);
-            ServerController.sendAndroidIdEvent(context);
+            //ServerController.sendAndroidIdEvent(context);
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }

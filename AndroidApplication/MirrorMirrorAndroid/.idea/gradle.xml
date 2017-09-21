@@ -7,8 +7,8 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
-            <option value="/am/st-james/home1/glewsimo/Desktop/MirrorMirror/AndroidApplication/MirrorMirrorAndroid" />
-            <option value="/am/st-james/home1/glewsimo/Desktop/MirrorMirror/AndroidApplication/MirrorMirrorAndroid/app" />
+            <option value="/am/courtenay/home1/slaterjack/MirrorMirror/AndroidApplication/MirrorMirrorAndroid" />
+            <option value="/am/courtenay/home1/slaterjack/MirrorMirror/AndroidApplication/MirrorMirrorAndroid/app" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

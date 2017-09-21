@@ -237,21 +237,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         isLoadingImages = false;
     }
 
-    public void makeWeightGraph(JSONArray w){
-        List<Weight> weights = new ArrayList<Weight>();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd_hh-MM-ss");
-        for(int i = 0; i < w.length(); i++){
-            try{
-                JSONObject object = w.getJSONObject(i);
-                Date d = dateFormat.parse(object.getString("date"));
-                double weight = Double.parseDouble(object.getString("weight"));
-                weights.add(new Weight(weight, d));
-            }catch(Exception e){
-                e.printStackTrace();
-            }
-        }
-
-    }
 
     //React to items selected within the sidebar.
     @Override
@@ -274,8 +259,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             weightIntent.putExtra("numDays", 365);
             numberOfDays = 365;
         }
+
         HomeActivity.this.startActivity(weightIntent);
-        ServerController.sendWeightsRequest(this, numberOfDays);
 
         return true;
     }

@@ -1,5 +1,6 @@
 package mirrormirror.swen302.mirrormirrorandroid.utilities;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -15,7 +16,13 @@ public class DateTimeManager {
         return dateTime;
     }
 
-    public static Date getDateFromString(String stringDate){
+    public static Date getDateFromString(String stringDate)   {
+        SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd");
+        try{
+            return ft.parse(stringDate);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
         return null;
     }
 }
