@@ -46,11 +46,9 @@ public class SocketSingleton {
         this.context = context;
         try {
             this.socket = IO.socket(SERVER_ADDRESS);
-            //ServerController.sendAndroidIdEvent(context);
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-
     }
 
 

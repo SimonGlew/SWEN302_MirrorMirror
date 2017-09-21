@@ -278,4 +278,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    public void onConnection(){
+        ServerController.sendAndroidIdEvent(this);
+    }
+
 }

@@ -134,6 +134,9 @@ public class ServerController {
         Emitter.Listener onAdditionImagesMessage = createNewAdditionImageListener(context);
         socket.on("request images success event", onAdditionImagesMessage);
 
+        Emitter.Listener onConnection = createConnectionListener(context);
+        socket.on(Socket.EVENT_CONNECT, onConnection);
+
 //        Emitter.Listener onWeightMessage = createWeightGraphListener(context);
 //        socket.on("request weights success event", onWeightMessage);
     }
@@ -143,6 +146,17 @@ public class ServerController {
 
         Emitter.Listener onWeightMessage = createWeightGraphListener(context);
         socket.on("request weights success event", onWeightMessage);
+
+
+    }
+
+    public static Emitter.Listener createConnectionListener(final HomeActivity homeActivity){
+        return new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                homeActivity.onConnection();
+            }
+        };
     }
 
     public static Emitter.Listener createWeightGraphListener(final WeightGraphActivity activity){
