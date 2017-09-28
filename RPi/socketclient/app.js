@@ -1,5 +1,5 @@
 var fs = require('fs');
-var fileName = '../smart-scale/weights.json';
+var fileName = '../wiiboard/weights.json';
 
 var socket = require('socket.io-client')('http://130.195.6.76:3000');
 socket.on('connect', function(){console.log('Connected!');});
