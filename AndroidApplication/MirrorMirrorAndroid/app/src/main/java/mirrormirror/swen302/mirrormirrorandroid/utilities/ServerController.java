@@ -132,5 +132,12 @@ public class ServerController {
         };
     }
 
+    public static Emitter.Listener createNewWeightListener(final HomeActivity homeActivity){
+        return new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
 
+            }
+        };
+    }
 }
