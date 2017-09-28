@@ -165,7 +165,7 @@ public class ServerController {
             public void call(Object... args) {
                 JSONArray jsonArray = (JSONArray)args[0];
                 List<Weight> weights = Weight.parseWeights(jsonArray);
-                activity.makeWeightGraph(weights);
+                activity.parseWeights(weights);
             }
         };
     }

@@ -1,21 +1,18 @@
 package mirrormirror.swen302.mirrormirrorandroid.adapters;
 
 import android.app.Activity;
-import android.content.Context;
-import android.media.Image;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import org.w3c.dom.Text;
-
+import java.io.File;
 import java.util.List;
 
 import mirrormirror.swen302.mirrormirrorandroid.R;
@@ -78,7 +75,7 @@ public class HorizontalAdapter extends RecyclerView.Adapter {
         imageHolder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ImageView mainImage = (ImageView)HorizontalAdapter.this.context.findViewById(R.id.main_image);
+                ImageView mainImage = (ImageView) HorizontalAdapter.this.context.findViewById(R.id.main_image);
                 Glide.with(context).load(ImageStorageManager.loadImageByName(filePaths.get(position),context)).into(mainImage);
                 parent.setBackgroundColor(context.getResources().getColor(R.color.imageSelectedColor));
                 if(highlightedPosition != -1 && highlightedPosition != position) {
