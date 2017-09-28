@@ -57,12 +57,12 @@ io.on('connection', function(socket) {
 
 	socket.on(androidConnection, function(data){
 		androidId = socket.id;
-		console.log("android connection on id " + androidId);
+		println("android connection on id " + androidId);
 	});
 
 	socket.on(piConnection, function(data){
 		piId = socket.id;
-		console.log("pi connection on id " + piId)
+		println("pi connection on id " + piId)
 	});
 
 	socket.on(requestWeights, function(data){
@@ -72,9 +72,6 @@ io.on('connection', function(socket) {
 		println("uid " + uid + " , numDays " + numDays);
 		db.getPreviousWeights(uid, numDays, function(results){
 			if(results.length > 0){
-				results.sort(function(a, b) {
-    			return (a.DateTime.substring(0,10) < b.DateTime.substring(0,10)) ? -1 : (a.DateTime.substring(0,10) > b.DateTime.substring(0,10)) ? 1 : 0;
-				});
 				console.log(results);
 				var dataToSend = [];
 				var prevDay = results[0].DateTime.substring(0, 10);
@@ -121,6 +118,7 @@ io.on('connection', function(socket) {
 		var uid = data.uid;
 		var weight = data.weight;
 		db.saveWeight(uid, new Date(), weight);
+		println("Send to android id " + androidId)
 		io.to(androidId).emit(weightSaved, {
 			'weight': weight
 		});
