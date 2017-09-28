@@ -63,16 +63,15 @@ public class InputWeightDialog extends AlertDialog implements View.OnClickListen
 //
     @Override
     public void onClick(View v) {
-        if(v.getId() == R.id.cancel_button) {
-            cancel();
+
+    }
 //        } else if(v.getId() == R.id.submit_button){
 //            float weightVal = leftPicker.getValue();
 //            weightVal += (rightPicker.getValue())/((int)(1/subKGStepping));
 //            ServerController.sendWeight(weightVal, DateTimeManager.getDatetimeAsString(), getContext());
 //            cancel();
 //        }
-        }
-    }
+//    }
 //
 //
 ////    @Override

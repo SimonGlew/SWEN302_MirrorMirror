@@ -43,6 +43,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private DrawerLayout drawerLayout;
     private NavigationView navView;
     private ActionBarDrawerToggle drawerToggle;
+    private WeightPopupDialog popup;
 
     public static final int CAMERA_ACTIVITY_REQUEST_CODE = 10;
 
@@ -66,6 +67,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.addDrawerListener(drawerToggle);
         filePaths = new ArrayList<>();
         isLoadingImages = false;
+        this.popup = null;
         setRecyclerView();
         setSocketListeners();
 
@@ -215,10 +217,20 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     public void loadWeightPopup(JSONObject object){
         try {
-            Double weight = object.getDouble("weight");
+            final Double weight = object.getDouble("weight");
             System.out.println(weight);
-            WeightPopupDialog popup = new WeightPopupDialog(this, weight);
-            popup.show();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if(HomeActivity.this.popup == null || !HomeActivity.this.popup.isShowing()) {
+                        HomeActivity.this.popup = new WeightPopupDialog(HomeActivity.this, weight);
+                        popup.show();
+                    }else{
+                        popup.updateWeight(weight);
+                    }
+                }
+            });
+
         }catch (Exception e){
             e.printStackTrace();
         }

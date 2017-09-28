@@ -1,6 +1,7 @@
 package mirrormirror.swen302.mirrormirrorandroid.utilities;
 
 import android.content.Context;
+import android.icu.text.DecimalFormat;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
@@ -16,14 +17,19 @@ import mirrormirror.swen302.mirrormirrorandroid.R;
  * Created by bondkyal on 28/09/17.
  */
 
-public class WeightPopupDialog extends AlertDialog implements View.OnClickListener{
+public class WeightPopupDialog extends AlertDialog {
 
     private TextView weightTextView;
     private Double weight;
 
     public WeightPopupDialog(@NonNull Context context, Double w) {
         super(context);
-        this.weight = w;
+        this.weight = roundWeight(w);
+    }
+
+    public void updateWeight(Double w){
+        this.weight = roundWeight(w);
+        this.weightTextView.setText(this.weight + " kg");
     }
 
     @Override
@@ -31,18 +37,14 @@ public class WeightPopupDialog extends AlertDialog implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.input_weight_popup);
 
-        Button cancel = (Button) findViewById(R.id.cancel_button);
         weightTextView = (TextView) findViewById(R.id.weight_label);
         weightTextView.setText(this.weight + " kg");
 
-        cancel.setOnClickListener(this);
     }
 
-    @Override
-    public void onClick(View v) {
-        if(v.getId() == R.id.cancel_button){
-            cancel();
-        }
+    public static Double roundWeight(Double w){
+        DecimalFormat df = new DecimalFormat("#.##");
+        return Double.parseDouble(df.format(w));
     }
 
 }
