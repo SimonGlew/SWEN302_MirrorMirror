@@ -139,6 +139,9 @@ public class ServerController {
 
 //        Emitter.Listener onWeightMessage = createWeightGraphListener(context);
 //        socket.on("request weights success event", onWeightMessage);
+
+        Emitter.Listener onNewWeightMessage = createNewWeightListener(context);
+        socket.on("weight saved event", onNewWeightMessage);
     }
 
     public static void setSocketWeightListener(WeightGraphActivity context){
@@ -190,5 +193,15 @@ public class ServerController {
         };
     }
 
+    public static Emitter.Listener createNewWeightListener(final HomeActivity homeActivity){
+        return new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                System.out.println("Yeee");
+                JSONObject jsonObject = (JSONObject) args[0];
+                homeActivity.loadWeightPopup(jsonObject);
+            }
+        };
+    }
 
 }
