@@ -245,23 +245,29 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         Intent weightIntent = new Intent(HomeActivity.this, WeightGraphActivity.class);
         if(id == R.id.weight7days){
             weightIntent.putExtra("numDays", 7);
+            weightIntent.putExtra("title", "Your Weight In Passed 7 Days");
         }else if(id == R.id.weight30days){
             System.out.println("30");
             weightIntent.putExtra("numDays", 30);
+            weightIntent.putExtra("title", "Your Weight In Passed 30 Days");
             numberOfDays = 30;
         }else if(id == R.id.weight180days){
             System.out.println("180");
             weightIntent.putExtra("numDays", 180);
+            weightIntent.putExtra("title", "Your Weight In Passed 180 Days");
+
             numberOfDays = 180;
         }else if(id == R.id.weight365days){
             System.out.println("365");
             weightIntent.putExtra("numDays", 365);
+            weightIntent.putExtra("title", "Your Weight In Passed 365 Days");
+
             numberOfDays = 365;
         }
 
         HomeActivity.this.startActivity(weightIntent);
 
-        return true;
+        return false;
     }
 
     @Override

@@ -3,10 +3,16 @@ package mirrormirror.swen302.mirrormirrorandroid.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.GridLabelRenderer;
+import com.jjoe64.graphview.Viewport;
+import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
+import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.DataPointInterface;
 import com.jjoe64.graphview.series.LineGraphSeries;
@@ -44,6 +50,16 @@ public class WeightGraphActivity extends AppCompatActivity {
 
     private double maxWeight = Double.MIN_VALUE;
     private double minWeight = Double.MAX_VALUE;
+    private Button graphButton;
+
+    private DataPoint[] datapoints;
+    private List<Weight> weights;
+
+    private GRAPHTYPE graphtype = GRAPHTYPE.BAR;
+
+    enum GRAPHTYPE{
+        BAR, LINE
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -52,54 +68,75 @@ public class WeightGraphActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         numDays = intent.getIntExtra("numDays", 0);
+        TextView title = (TextView)findViewById(R.id.weight_graph_title);
+        graphButton = (Button) findViewById(R.id.graph_switch_button);
+        graphButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(graphtype == GRAPHTYPE.BAR) graphtype = GRAPHTYPE.LINE;
+                else if (graphtype == GRAPHTYPE.LINE) graphtype = GRAPHTYPE.BAR;
+                makeGraph();
+            }
+        });
+        title.setText(intent.getStringExtra("title"));
+
         ServerController.setSocketWeightListener(this);
         ServerController.sendWeightsRequest(this, numDays);
-
     }
 
-    public void makeWeightGraph(List<Weight> weights){
-        System.out.println(numDays);
-        //Go get data
+    public void parseWeights(List<Weight> weights){
+        this.weights = weights;
+        this.datapoints = generateData(weights);
+        makeGraph();
+    }
 
-        //ServerController.getWeights(numDays, this);
-
-        DataPoint[] datapoints = generateData(weights);
-        LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(datapoints);
+    public void makeGraph(){
         GraphView graph = (GraphView) findViewById(R.id.graph);
-
         graph.getViewport().setXAxisBoundsManual(true);
-        graph.getViewport().setMinX(0);
-        graph.getViewport().setMaxX(30);
+
+        graph.getViewport().setMinX(datapoints[0].getX());
+        graph.getViewport().setMaxX(7);
 
         graph.getViewport().setYAxisBoundsManual(true);
-        graph.getViewport().setMinY(minWeight);
-        graph.getViewport().setMaxY(maxWeight);
+        graph.getViewport().setMinY(0);
+        graph.getViewport().setMaxY(maxWeight + (maxWeight/5));
 
         graph.getViewport().setScrollable(true);
+
         graph.getViewport().setScalableY(false);
         graph.getViewport().setScrollableY(false);
+        graph.getViewport().setScalable(false);
 
 
-        series.setColor(getResources().getColor(R.color.colorAccent));
-        series.setThickness(7);
-        series.setDrawDataPoints(true);
-        series.setDataPointsRadius(13);
+        Series series = null;
+        if(graphtype == GRAPHTYPE.LINE){
+            LineGraphSeries<DataPoint> lineSeries = new LineGraphSeries<DataPoint>(datapoints);
+            lineSeries.setColor(getResources().getColor(R.color.colorAccent));
+            lineSeries.setThickness(7);
+            lineSeries.setDrawDataPoints(true);
+            lineSeries.setDataPointsRadius(13);
+
+            series = lineSeries;
+        }
+        else{
+            BarGraphSeries <DataPoint> barSeries = new BarGraphSeries<>(datapoints);
+            barSeries.setSpacing(10);
+            barSeries.setColor(getResources().getColor(R.color.colorAccent));
+            series = barSeries;
+        }
 
         series.setOnDataPointTapListener(new OnDataPointTapListener() {
             @Override
             public void onTap(Series series, DataPointInterface dataPoint) {
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(new Date());
-                cal.add(Calendar.DATE, (int)((dataPoint.getX() + 1) - numDays));
+                cal.add(Calendar.DATE, (int)(-(dataPoint.getX())));
                 Toast.makeText(WeightGraphActivity.this, "On " + format.format(cal.getTime()) + ", you weighed: " +
                         dataPoint.getY() + "kgs", Toast.LENGTH_SHORT).show();
             }
         });
-
+        graph.removeAllSeries();
         graph.addSeries(series);
-
-
-
     }
 
     public DataPoint[] generateData(List<Weight> weights) {
@@ -117,12 +154,11 @@ public class WeightGraphActivity extends AppCompatActivity {
             System.out.println(dayDiff);
             if(dayDiff < 0){
                 int z = 1;
-                System.out.println("Simon");
+//                System.out.println("Simon");
             }
 
 
             DataPoint d = new DataPoint(dayDiff, Double.parseDouble(df.format(weight)));
-
             dataPoints[i] = d;
         }
         return dataPoints;
