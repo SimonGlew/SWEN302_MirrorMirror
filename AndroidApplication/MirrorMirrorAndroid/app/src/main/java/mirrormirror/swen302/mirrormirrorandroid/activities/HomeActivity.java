@@ -193,7 +193,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
             }
         });
+    }
 
+    private void createWeightPopup() {
 
     }
 
@@ -214,8 +216,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         if(filePaths.size() < 10){
             ServerController.sendImageAdditionsRequest(this, 5, filePaths.size());
         }
-
-
     }
 
     public void loadMoreImages(JSONArray images){
@@ -232,6 +232,16 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             }
         }
         isLoadingImages = false;
+    }
+
+    public void loadWeightPopup(JSONArray weight){
+        try {
+            JSONObject object = weight.getJSONObject(0);
+
+            createWeightPopup();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     //React to items selected within the sidebar.
