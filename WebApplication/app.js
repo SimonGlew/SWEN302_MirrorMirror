@@ -7,7 +7,7 @@ var filesystem = require('file-system');
 var fs = require('fs');
 
 var router = require('./src/js/router');
-
+var parser = require('./src/js/parser');
 var db = require('./src/js/dbManager')('MirrorMirror');
 
 var port = 3000;
@@ -108,7 +108,7 @@ io.on('connection', function(socket) {
 	socket.on(imageEvent, function(data) {
 		println("New image event received");
 		var uid = data.uid;
-		var datetime = data.datetime;
+		var datetime = parser.toDatabaseDate(data.datetime);
 		var imageString = data.image;
 		saveImage(imageString, uid, datetime);
 	});
