@@ -3,23 +3,35 @@ package mirrormirror.swen302.mirrormirrorandroid.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.GridLabelRenderer;
 import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.DataPointInterface;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.jjoe64.graphview.series.OnDataPointTapListener;
+import com.jjoe64.graphview.series.Series;
 
+import org.joda.time.Days;
+
+import java.lang.reflect.Array;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import mirrormirror.swen302.mirrormirrorandroid.R;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.ServerController;
+import mirrormirror.swen302.mirrormirrorandroid.utilities.Weight;
 
 /**
  * Created by glewsimo on 7/09/17.
@@ -28,6 +40,10 @@ import mirrormirror.swen302.mirrormirrorandroid.utilities.ServerController;
 public class WeightGraphActivity extends AppCompatActivity {
 
     private int numDays = 0;
+    private SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+
+    private double maxWeight = Double.MIN_VALUE;
+    private double minWeight = Double.MAX_VALUE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -36,43 +52,77 @@ public class WeightGraphActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         numDays = intent.getIntExtra("numDays", 0);
-        makeWeightGraph();
+        ServerController.setSocketWeightListener(this);
+        ServerController.sendWeightsRequest(this, numDays);
+
     }
 
-    private void makeWeightGraph(){
+    public void makeWeightGraph(List<Weight> weights){
         System.out.println(numDays);
         //Go get data
 
         //ServerController.getWeights(numDays, this);
+
+        DataPoint[] datapoints = generateData(weights);
+        LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(datapoints);
         GraphView graph = (GraphView) findViewById(R.id.graph);
 
-        LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(generateData());
+        graph.getViewport().setXAxisBoundsManual(true);
+        graph.getViewport().setMinX(0);
+        graph.getViewport().setMaxX(30);
 
-        series.setTitle("Previous " + numDays + " days");
+        graph.getViewport().setYAxisBoundsManual(true);
+        graph.getViewport().setMinY(minWeight);
+        graph.getViewport().setMaxY(maxWeight);
+
+        graph.getViewport().setScrollable(true);
+        graph.getViewport().setScalableY(false);
+        graph.getViewport().setScrollableY(false);
+
+
         series.setColor(getResources().getColor(R.color.colorAccent));
+        series.setThickness(7);
         series.setDrawDataPoints(true);
-        series.setDataPointsRadius(10);
+        series.setDataPointsRadius(13);
+
+        series.setOnDataPointTapListener(new OnDataPointTapListener() {
+            @Override
+            public void onTap(Series series, DataPointInterface dataPoint) {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(new Date());
+                cal.add(Calendar.DATE, (int)((dataPoint.getX() + 1) - numDays));
+                Toast.makeText(WeightGraphActivity.this, "On " + format.format(cal.getTime()) + ", you weighed: " +
+                        dataPoint.getY() + "kgs", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         graph.addSeries(series);
 
-        graph.getViewport().setMinX(numDays);
-        graph.getViewport().setMaxX(numDays);
+
 
     }
 
-    public DataPoint[] generateData() {
-        double min = 72.0;
-        double max = 80.0;
-
-        Random r = new Random();
+    public DataPoint[] generateData(List<Weight> weights) {
         DecimalFormat df = new DecimalFormat("#.#");
 
-        DataPoint[] dataPoints = new DataPoint[numDays];
-        for(int i = 0; i < numDays; i ++) {
+        DataPoint[] dataPoints = new DataPoint[weights.size()];
+        for(int i = 0; i < weights.size(); i ++) {
+            double weight = weights.get(i).getWeight();
+            long timeDiff = new Date().getTime() - weights.get(i).getDate().getTime();
+            double dayDiff = TimeUnit.DAYS.convert(timeDiff, TimeUnit.MILLISECONDS);
 
-            double weight = (min + (max - min) * r.nextDouble());
+            if(weight > maxWeight) maxWeight = weight;
+            if(weight < minWeight) minWeight = weight;
 
-            DataPoint d = new DataPoint(i, Double.parseDouble(df.format(weight)));
+            System.out.println(dayDiff);
+            if(dayDiff < 0){
+                int z = 1;
+                System.out.println("Simon");
+            }
+
+
+            DataPoint d = new DataPoint(dayDiff, Double.parseDouble(df.format(weight)));
+
             dataPoints[i] = d;
         }
         return dataPoints;

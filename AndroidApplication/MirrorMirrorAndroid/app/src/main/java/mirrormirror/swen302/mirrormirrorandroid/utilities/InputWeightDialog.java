@@ -36,56 +36,56 @@ public class InputWeightDialog extends AlertDialog implements View.OnClickListen
         super(context);
     }
 
-    void populateSpinnerAdapters(){
-        String[] rightAdapterVals = new String[(int)(1/subKGStepping)]; //Sub-KG spinner
-        for(int n = 0; n < (int)(1/subKGStepping); n++){
-            rightAdapterVals[n] = dF.format(subKGStepping*n);
-        }
-        leftPicker = (NumberPicker) findViewById(R.id.weight_picker_left);
-        rightPicker = (NumberPicker) findViewById(R.id.weight_picker_right);
-        leftPicker.setMaxValue(maxWeight);
-        leftPicker.setMinValue(1);
-        rightPicker.setMinValue(0);
-        rightPicker.setMaxValue(9);
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.input_weight_dialog);
-
-        populateSpinnerAdapters();
-        Button cancel = (Button) findViewById(R.id.cancel_button);
-        Button submit = (Button) findViewById(R.id.submit_button);
-        cancel.setOnClickListener(this);
-        submit.setOnClickListener(this);
-    }
-
+//    void populateSpinnerAdapters(){
+//        String[] rightAdapterVals = new String[(int)(1/subKGStepping)]; //Sub-KG spinner
+//        for(int n = 0; n < (int)(1/subKGStepping); n++){
+//            rightAdapterVals[n] = dF.format(subKGStepping*n);
+//        }
+//        leftPicker = (NumberPicker) findViewById(R.id.weight_picker_left);
+//        rightPicker = (NumberPicker) findViewById(R.id.weight_picker_right);
+//        leftPicker.setMaxValue(maxWeight);
+//        leftPicker.setMinValue(1);
+//        rightPicker.setMinValue(0);
+//        rightPicker.setMaxValue(9);
+//    }
+//
+//    @Override
+//    protected void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        setContentView(R.layout.input_weight_dialog);
+//
+//        populateSpinnerAdapters();
+//        Button cancel = (Button) findViewById(R.id.cancel_button);
+//        Button submit = (Button) findViewById(R.id.submit_button);
+//        cancel.setOnClickListener(this);
+//        submit.setOnClickListener(this);
+//    }
+//
     @Override
     public void onClick(View v) {
-        if(v.getId() == R.id.cancel_button){
-            cancel();
-        } else if(v.getId() == R.id.submit_button){
-            float weightVal = leftPicker.getValue();
-            weightVal += (rightPicker.getValue())/((int)(1/subKGStepping));
-            ServerController.sendWeight(weightVal, DateTimeManager.getDatetimeAsString(), getContext());
-            cancel();
-        }
+
     }
-
-
-//    @Override
-//    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//        String selected = (String) parent.getItemAtPosition(position);
-////        if(parent.getId() == R.id.weight_spinner_left){
-////            leftSelected = Float.valueOf(selected);
-////        } else if(parent.getId() == R.id.weight_spinner_right){
-////            rightSelected = Float.valueOf(selected);
-////        }
+//        } else if(v.getId() == R.id.submit_button){
+//            float weightVal = leftPicker.getValue();
+//            weightVal += (rightPicker.getValue())/((int)(1/subKGStepping));
+//            ServerController.sendWeight(weightVal, DateTimeManager.getDatetimeAsString(), getContext());
+//            cancel();
+//        }
 //    }
 //
-//    @Override
-//    public void onNothingSelected(AdapterView<?> parent) {
 //
-//    }
+////    @Override
+////    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+////        String selected = (String) parent.getItemAtPosition(position);
+//////        if(parent.getId() == R.id.weight_spinner_left){
+//////            leftSelected = Float.valueOf(selected);
+//////        } else if(parent.getId() == R.id.weight_spinner_right){
+//////            rightSelected = Float.valueOf(selected);
+//////        }
+////    }
+////
+////    @Override
+////    public void onNothingSelected(AdapterView<?> parent) {
+////
+////    }
 }
