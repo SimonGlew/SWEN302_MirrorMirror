@@ -3,10 +3,16 @@
         xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/input_weight"
+        app:showAsAction="always"
+        android:title="InputWeight"
+        android:icon="@drawable/ic_input_weight_white_24px"/>
+
+    <item
         android:id="@+id/take_image"
         app:showAsAction="always"
-        android:title="Take Image"
-        android:icon="@mipmap/ic_launcher"/>
+        android:title="TakeImage"
+        android:icon="@drawable/ic_add_a_photo_white_24px"/>
 
 
 </menu>
