@@ -20,7 +20,7 @@ var piConnection = 'pi connection event'
 var imageEvent = 'image event';
 var weightEvent = 'weight event';
 var loginEvent = 'login event';
-var loginSuccessEvent = 'login success event';
+var loginResponseEvent = 'login response event';
 var requestLastImages = 'request last images event';
 var requestImages = 'request images event'
 var requestWeights = 'request weights event'
@@ -35,6 +35,7 @@ server.listen(port, function() {
 });
 
 app.set('view engine', 'ejs');
+app.set('views', './src/views');
 app.use(express.static('public'));
 app.use('/', router);
 
@@ -49,8 +50,11 @@ io.on('connection', function(socket) {
 
 		db.checkLoginDetails(username, password, function(results){
 			if(results != null){
-				println("Login successful, id: " + results.uid);
-				socket.emit(loginSuccessEvent, { 'uid' : results.uid});
+				println("Login successful, id: " + results.UID);
+				socket.emit(loginResponseEvent, { 'uid' : results.UID});
+			}else{
+				println("Login unsuccessful");
+				socket.emit(loginResponseEvent, {'uid' : -1});
 			}
 		});
 	});
@@ -72,23 +76,17 @@ io.on('connection', function(socket) {
 		println("uid " + uid + " , numDays " + numDays);
 		db.getPreviousWeights(uid, numDays, function(results){
 			if(results.length > 0){
-				console.log(results);
 				var dataToSend = [];
 				var prevDay = results[0].DateTime.substring(0, 10);
-				console.log(prevDay);
 				var dayWeight = 0;
 				var countOfWeights = 0;
 
 				for(var i = 0; i < results.length; i++){
 					var event = results[i];
-					console.log("comparing to: "+ event.DateTime.substring(0,10));
 					if(event.DateTime.substring(0, 10) === prevDay){
-						console.log("they match");
 						dayWeight += event.Weight;
 						countOfWeights ++;
 					}else{
-						console.log("not match, add to array");
-						console.log(dayWeight + " " + countOfWeights);
 						var weight = dayWeight / countOfWeights;
 						dataToSend.push({'date' : prevDay, 'weight' : weight});
 						dayWeight = event.Weight;
@@ -97,8 +95,7 @@ io.on('connection', function(socket) {
 					prevDay = event.DateTime.substring(0, 10);
 				}
 				var weight = dayWeight / countOfWeights;
-				dataToSend.push({'date' : prevDay, 'weight' : weight});
-				console.log(dataToSend);
+				dataToSend.push({'date' : prevDay, 'weight' : weight, 'bmi': 25, 'height': 180});
 				//past 7 days of weights, could have more than 1 per day, has rows of (datetime, weight)
 				socket.emit(requestWeightsSuccess, dataToSend);
 			}
@@ -120,7 +117,8 @@ io.on('connection', function(socket) {
 		db.saveWeight(uid, new Date(), weight);
 		println("Send to android id " + androidId)
 		io.to(androidId).emit(weightSaved, {
-			'weight': weight
+			'weight': weight,
+			'bmi': 25
 		});
 	});
 
