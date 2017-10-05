@@ -2,6 +2,7 @@ package mirrormirror.swen302.mirrormirrorandroid.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -140,11 +141,21 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             //Popup weight input dialog
             //WeightPopupDialog iwd = new WeightPopupDialog(this);
             //iwd.show();
-        }
-        else if (drawerToggle.onOptionsItemSelected(item)) {
+        } else if(item.getItemId() == R.id.logout) {
+            logout();
+        } else if (drawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void logout(){
+        SharedPreferences sharedPreferences = this.getSharedPreferences(this.getString(R.string.login_details), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove("uid");
+        editor.apply();
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
     }
 
     @Override
