@@ -52,8 +52,15 @@ function getPreviousWeights(uid, numDays, callback){
 	});
 }
 
+function getFullName(uid, callback){
+	db.all("SELECT FirstName, LastName FROM users WHERE uid = " + uid, function(err, results){
+		callback(results[0].FirstName + " " + results[0].LastName);
+	});
+}
+
 function checkLoginDetails(username, password, callback){
-	db.all("SELECT UID FROM Users WHERE Username = " + username + " AND Password = " + password, function(err, results){
+	console.log(username + "," + password);
+	db.all("SELECT UID FROM Users WHERE Username = '" + username + "' AND Password = '" + password + "'", function(err, results){
 		if(err){
 			console.log(err);
 		}else{
@@ -82,6 +89,7 @@ function openDatabase(dbname, callback){
 	db.saveWeight = saveWeight;
 	db.getImages = getImages;
 	db.checkLoginDetails = checkLoginDetails;
+	db.getFullName = getFullName;
 	db.getPreviousWeights = getPreviousWeights;
 	if(callback){
 		callback();

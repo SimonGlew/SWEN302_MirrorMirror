@@ -20,7 +20,7 @@ var piConnection = 'pi connection event'
 var imageEvent = 'image event';
 var weightEvent = 'weight event';
 var loginEvent = 'login event';
-var loginSuccessEvent = 'login success event';
+var loginResponseEvent = 'login response	 event';
 var requestLastImages = 'request last images event';
 var requestImages = 'request images event'
 var requestWeights = 'request weights event'
@@ -35,6 +35,7 @@ server.listen(port, function() {
 });
 
 app.set('view engine', 'ejs');
+app.set('views', './src/views');
 app.use(express.static('public'));
 app.use('/', router);
 
@@ -49,8 +50,11 @@ io.on('connection', function(socket) {
 
 		db.checkLoginDetails(username, password, function(results){
 			if(results != null){
-				println("Login successful, id: " + results.uid);
-				socket.emit(loginSuccessEvent, { 'uid' : results.uid});
+				println("Login successful, id: " + results.UID);
+				socket.emit(loginResponseEvent, { 'uid' : results.UID});
+			}else{
+				println("Login unsuccessful");
+				socket.emit(loginResponseEvent, {'uid' : -1});
 			}
 		});
 	});

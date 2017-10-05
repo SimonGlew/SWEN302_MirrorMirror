@@ -9,7 +9,7 @@ function toDatabaseDate(stringDate){
 
   return new Date(dateSplit[0], dateSplit[1], dateSplit[2], timeSplit[0], timeSplit[1], timeSplit[2], 0);
 }
-parser.toDatabaseDate = toDatabaseDate;
+//parser.toDatabaseDate = toDatabaseDate;
 
 function toAndroidDate(date){
   //GOT: YYYY-MM-DD HH:MM:SS
@@ -21,6 +21,6 @@ function toAndroidDate(date){
 
   return dateSplit[0] + '-' + dateSplit[1] + '-' + dateSplit[2] + '_' + timeSplit[0] + '-' + timeSplit[1] + '-' + timeSplit[2];
 }
-parser.toAndroidDate = toAndroidDate;
+//parser.toAndroidDate = toAndroidDate;
 
-module.exports = parser;
+//module.exports = parser;
