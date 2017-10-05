@@ -24,7 +24,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import mirrormirror.swen302.mirrormirrorandroid.R;
@@ -159,6 +163,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         for(int i = 0; i < files.length; i ++){
             filePaths.add(files[i].getName());
         }
+        orderFilePaths();
+
         ServerController.sendImagesRequest(this, 5);
     }
 
@@ -167,6 +173,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         for(int i = filePaths.size(); i < files.length; i ++){
             filePaths.add(files[i].getName());
         }
+        orderFilePaths();
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -236,6 +243,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    public void orderFilePaths(){
+        Collections.sort(filePaths, new strComparator());
+
+    }
 
     //React to items selected within the sidebar.
     @Override
@@ -285,6 +296,25 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     public void onConnection(){
         ServerController.sendAndroidIdEvent(this);
+    }
+
+    class strComparator implements Comparator<String> {
+        @Override
+        public int compare(String s1, String s2){
+            try {
+                SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd_kk-mm-ss");
+                Date d1 = fmt.parse(s1);
+                Date d2 = fmt.parse(s2);
+
+                if(d1.before(d2))return 1;
+                else{
+                    return -1;
+                }
+            }
+            catch(Exception e){
+                return -1;
+            }
+        }
     }
 
 }
