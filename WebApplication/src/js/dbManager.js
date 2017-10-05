@@ -42,8 +42,9 @@ function saveWeight(uid, datetime, weight, callback){
 }
 
 function getPreviousWeights(uid, numDays, callback){
-	db.all("SELECT datetime, weight FROM weights WHERE DateTime > (SELECT DATETIME('now', '-" + (numDays - 1) + " day')) AND uid = " + uid + " ORDER BY DateTime DESC", function(err, results){
-		console.log(results);
+	db.all("SELECT datetime, weight FROM weights WHERE DateTime > (SELECT DATETIME('now', '-" + (numDays - 1) + " day')) AND uid = " + uid, function(err, results){
+	//db.all("SELECT datetime, weight FROM weights WHERE DateTime > (SELECT DATETIME('now', '-" + (numDays - 1) + " day')) AND uid = " + uid + " ORDER BY DateTime DESC", function(err, results){
+		console.log("results: " + results);
 		if(err){
 			console.log(err);
 		}else{
@@ -52,6 +53,8 @@ function getPreviousWeights(uid, numDays, callback){
 	});
 }
 
+
+
 function getFullName(uid, callback){
 	db.all("SELECT FirstName, LastName FROM users WHERE uid = " + uid, function(err, results){
 		callback(results[0].FirstName + " " + results[0].LastName);
@@ -59,7 +62,6 @@ function getFullName(uid, callback){
 }
 
 function checkLoginDetails(username, password, callback){
-	console.log(username + "," + password);
 	db.all("SELECT UID FROM Users WHERE Username = '" + username + "' AND Password = '" + password + "'", function(err, results){
 		if(err){
 			console.log(err);
