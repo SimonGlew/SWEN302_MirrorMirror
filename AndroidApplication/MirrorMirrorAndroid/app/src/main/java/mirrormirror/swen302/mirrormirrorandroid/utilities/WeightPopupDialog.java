@@ -20,17 +20,24 @@ import mirrormirror.swen302.mirrormirrorandroid.R;
 public class WeightPopupDialog extends AlertDialog {
 
     private TextView weightTextView;
+    private TextView bmiTextView;
     private Double weight;
+    private Double bmi;
 
-    public WeightPopupDialog(@NonNull Context context, Double w) {
+    public WeightPopupDialog(@NonNull Context context, Double w, Double b) {
         super(context);
         this.weight = roundWeight(w);
+        this.bmi = b;
     }
 
-    public void updateWeight(Double w){
+    public void updateValues(Double w, Double b){
         this.weight = roundWeight(w);
         this.weightTextView.setText(this.weight + " kg");
+        this.bmi = b;
+        this.bmiTextView.setText(this.bmi+"");
     }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +46,8 @@ public class WeightPopupDialog extends AlertDialog {
 
         weightTextView = (TextView) findViewById(R.id.weight_label);
         weightTextView.setText(this.weight + " kg");
-
+        bmiTextView = (TextView) findViewById(R.id.bmi_label);
+        bmiTextView.setText(this.bmi+"");
     }
 
     public static Double roundWeight(Double w){

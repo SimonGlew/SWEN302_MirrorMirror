@@ -40,6 +40,15 @@ function saveWeight(uid, datetime, weight, callback){
 		callback();
 	}
 }
+function saveHeight(uid, datetime, height, callback){
+	height = height.toFixed(1);
+	var stmt = db.prepare('INSERT INTO heights(UID, DateTime, Height) VALUES (?, ?, ?)');
+	stmt.run(uid, formatDateTime(datetime), height);
+	stmt.finalize();
+	if(callback){
+		callback();
+	}
+}
 
 function getPreviousWeights(uid, numDays, callback){
 	db.all("SELECT datetime, weight FROM weights WHERE DateTime > (SELECT DATETIME('now', '-" + (numDays - 1) + " day')) AND uid = " + uid, function(err, results){
@@ -53,12 +62,33 @@ function getPreviousWeights(uid, numDays, callback){
 	});
 }
 
-
-
 function getFullName(uid, callback){
 	db.all("SELECT FirstName, LastName FROM users WHERE uid = " + uid, function(err, results){
 		callback(results[0].FirstName + " " + results[0].LastName);
 	});
+}
+
+function getPreviousHeights(uid, numDays, callback){
+	db.all("SELECT datetime, height FROM heights WHERE DateTime > (SELECT DATETIME('now', '-" + (numDays - 1) + " day')) AND uid = " + uid + " ORDER BY DateTime DESC", function(err, results){
+		console.log(results);
+		if(err){
+			console.log(err);
+		}else{
+			callback(results);
+		}
+	});
+}
+
+function getHeightAtDay(uid, date, callback){
+	//TODO: GET THE LAST RECORDED HEIGHT OF THE USER BEFORE THIS DATE
+	/*db.all("SELECT datetime, height FROM heights WHERE DateTime > (SELECT DATETIME('now', '-" + (numDays - 1) + " day')) AND uid = " + uid + " ORDER BY DateTime DESC", function(err, results){
+		console.log(results);
+		if(err){
+			console.log(err);
+		}else{
+			callback(results);
+		}
+	});*/
 }
 
 function checkLoginDetails(username, password, callback){
