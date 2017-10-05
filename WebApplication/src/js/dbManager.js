@@ -3,7 +3,7 @@ var db;
 var dateFormat = require('dateformat');
 
 function formatDateTime(datetime){
-	return dateFormat(datetime, "yyyy-mm-dd_hh-MM-ss");
+	return dateFormat(datetime, "yyyy-mm-dd hh:MM:ss");
 }
 
 function savePhoto(uid, datetime, filepath, callback){
@@ -42,11 +42,11 @@ function saveWeight(uid, datetime, weight, callback){
 }
 
 function getPreviousWeights(uid, numDays, callback){
-	db.all("SELECT datetime, weight FROM weights WHERE uid = " + uid, function(err, results){
+	db.all("SELECT datetime, weight FROM weights WHERE DateTime > (SELECT DATETIME('now', '-" + (numDays - 1) + " day')) AND uid = " + uid + " ORDER BY DateTime DESC", function(err, results){
+		console.log(results);
 		if(err){
 			console.log(err);
 		}else{
-			var weightCounts = [];
 			callback(results);
 		}
 	});

@@ -52,7 +52,7 @@ public class InputWeightDialog extends AlertDialog implements View.OnClickListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.input_weight_dialog);
+        setContentView(R.layout.input_weightscroll_popup);
 
         populateSpinnerAdapters();
         Button cancel = (Button) findViewById(R.id.cancel_button);
@@ -72,20 +72,4 @@ public class InputWeightDialog extends AlertDialog implements View.OnClickListen
             cancel();
         }
     }
-
-
-//    @Override
-//    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//        String selected = (String) parent.getItemAtPosition(position);
-////        if(parent.getId() == R.id.weight_spinner_left){
-////            leftSelected = Float.valueOf(selected);
-////        } else if(parent.getId() == R.id.weight_spinner_right){
-////            rightSelected = Float.valueOf(selected);
-////        }
-//    }
-//
-//    @Override
-//    public void onNothingSelected(AdapterView<?> parent) {
-//
-//    }
 }

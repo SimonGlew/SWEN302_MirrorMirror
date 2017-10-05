@@ -1,57 +1,38 @@
 package mirrormirror.swen302.mirrormirrorandroid.activities;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import mirrormirror.swen302.mirrormirrorandroid.R;
-import mirrormirror.swen302.mirrormirrorandroid.activities.CameraPreviewActivity;
 import mirrormirror.swen302.mirrormirrorandroid.adapters.HorizontalAdapter;
-import mirrormirror.swen302.mirrormirrorandroid.utilities.DateTimeManager;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.ImageStorageManager;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.InputWeightDialog;
+import mirrormirror.swen302.mirrormirrorandroid.utilities.WeightPopupDialog;
+import mirrormirror.swen302.mirrormirrorandroid.utilities.PermissionRequester;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.ServerController;
 
 /**
@@ -63,6 +44,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private DrawerLayout drawerLayout;
     private NavigationView navView;
     private ActionBarDrawerToggle drawerToggle;
+    private WeightPopupDialog popup;
 
     public static final int CAMERA_ACTIVITY_REQUEST_CODE = 10;
 
@@ -86,6 +68,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.addDrawerListener(drawerToggle);
         filePaths = new ArrayList<>();
         isLoadingImages = false;
+        this.popup = null;
         setRecyclerView();
         setSocketListeners();
 
@@ -149,8 +132,11 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == R.id.take_image){
-            Intent intent = new Intent(this, CameraPreviewActivity.class);
-            startActivityForResult(intent, CAMERA_ACTIVITY_REQUEST_CODE);
+            //if has permission already will run here, else will be activated in onpermission result
+            if(PermissionRequester.requestCameraPermission(this)){
+                Intent intent = new Intent(this, CameraPreviewActivity.class);
+                startActivityForResult(intent, CAMERA_ACTIVITY_REQUEST_CODE);
+            }
         } else if(item.getItemId() == R.id.input_weight){
             //Popup weight input dialog
             InputWeightDialog iwd = new InputWeightDialog(this);
@@ -230,12 +216,76 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         isLoadingImages = false;
     }
 
+    public void loadWeightPopup(JSONObject object){
+        try {
+            final Double weight = object.getDouble("weight");
+            System.out.println(weight);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if(HomeActivity.this.popup == null || !HomeActivity.this.popup.isShowing()) {
+                        HomeActivity.this.popup = new WeightPopupDialog(HomeActivity.this, weight);
+                        popup.show();
+                    }else{
+                        popup.updateWeight(weight);
+                    }
+                }
+            });
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
     //React to items selected within the sidebar.
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        //if(id == R.id.drawer_placeholder1)...
-        return true;
+        int numberOfDays = 7;
+        Intent weightIntent = new Intent(HomeActivity.this, WeightGraphActivity.class);
+        if(id == R.id.weight7days){
+            weightIntent.putExtra("numDays", 7);
+            weightIntent.putExtra("title", "Your Weight In Passed 7 Days");
+        }else if(id == R.id.weight30days){
+            System.out.println("30");
+            weightIntent.putExtra("numDays", 30);
+            weightIntent.putExtra("title", "Your Weight In Passed 30 Days");
+            numberOfDays = 30;
+        }else if(id == R.id.weight180days){
+            System.out.println("180");
+            weightIntent.putExtra("numDays", 180);
+            weightIntent.putExtra("title", "Your Weight In Passed 180 Days");
+
+            numberOfDays = 180;
+        }else if(id == R.id.weight365days){
+            System.out.println("365");
+            weightIntent.putExtra("numDays", 365);
+            weightIntent.putExtra("title", "Your Weight In Passed 365 Days");
+
+            numberOfDays = 365;
+        }
+
+        HomeActivity.this.startActivity(weightIntent);
+
+        return false;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if(requestCode == PermissionRequester.CAMERA_PERMISSION_CONSTANT){
+            Intent intent = new Intent(this, CameraPreviewActivity.class);
+            startActivityForResult(intent, CAMERA_ACTIVITY_REQUEST_CODE);
+        }
+        else if(requestCode == PermissionRequester.INTERNET_PERMISSION_CONSTANT){
+
+        }
+    }
+
+    public void onConnection(){
+        ServerController.sendAndroidIdEvent(this);
     }
 
 }

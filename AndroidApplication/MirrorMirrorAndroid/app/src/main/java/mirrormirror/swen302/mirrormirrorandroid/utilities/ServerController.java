@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mirrormirror.swen302.mirrormirrorandroid.activities.HomeActivity;
+import mirrormirror.swen302.mirrormirrorandroid.activities.WeightGraphActivity;
 
 /**
  * Created by bondkyal on 10/08/17.
@@ -55,13 +56,28 @@ public class ServerController {
         try {
             messageObject.put("uid", "3");
             messageObject.put("weight", weight);
-            messageObject.put("datetime", datetime);
 
         }catch(Exception e){
             e.printStackTrace();
         }
 
         socket.emit("weight event", messageObject);
+    }
+
+    public static void sendWeightsRequest(Context context, int numberOfDays){
+        Socket socket = SocketSingleton.getInstance(context).getSocket();
+        if(!socket.connected()){
+            socket.connect();
+        }
+
+        JSONObject messageObject = new JSONObject();
+        try{
+            messageObject.put("uid", 3);
+            messageObject.put("numDays", numberOfDays);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        socket.emit("request weights event", messageObject);
     }
 
     public static void sendImagesRequest(Context context, int numberOfImages){
@@ -101,6 +117,14 @@ public class ServerController {
         socket.emit("request images event", messageObject);
     }
 
+    public static void sendAndroidIdEvent(Context context){
+        Socket socket = SocketSingleton.getInstance(context).getSocket();
+        if(!socket.connected())
+            socket.connect();
+
+        socket.emit("android connection event");
+    }
+
     public static void setSocketListeners(HomeActivity context){
         Socket socket = SocketSingleton.getInstance(context).getSocket();
 
@@ -110,27 +134,74 @@ public class ServerController {
         Emitter.Listener onAdditionImagesMessage = createNewAdditionImageListener(context);
         socket.on("request images success event", onAdditionImagesMessage);
 
+        Emitter.Listener onConnection = createConnectionListener(context);
+        socket.on(Socket.EVENT_CONNECT, onConnection);
+
+//        Emitter.Listener onWeightMessage = createWeightGraphListener(context);
+//        socket.on("request weights success event", onWeightMessage);
+
+        Emitter.Listener onNewWeightMessage = createNewWeightListener(context);
+        socket.on("weight saved event", onNewWeightMessage);
     }
 
-    public static Emitter.Listener createNewImageListener(final HomeActivity homeActivity){
+    public static void setSocketWeightListener(WeightGraphActivity context){
+        Socket socket = SocketSingleton.getInstance(context).getSocket();
+
+        Emitter.Listener onWeightMessage = createWeightGraphListener(context);
+        socket.on("request weights success event", onWeightMessage);
+
+
+    }
+
+    public static Emitter.Listener createConnectionListener(final HomeActivity homeActivity){
         return new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                    JSONArray jsonArray = (JSONArray)args[0];
-                    homeActivity.loadInitialImagesFromServer(jsonArray);
+                homeActivity.onConnection();
             }
         };
     }
 
-    public static Emitter.Listener createNewAdditionImageListener(final HomeActivity homeActivity){
+    public static Emitter.Listener createWeightGraphListener(final WeightGraphActivity activity){
         return new Emitter.Listener() {
             @Override
             public void call(Object... args) {
                 JSONArray jsonArray = (JSONArray)args[0];
-                homeActivity.loadMoreImages(jsonArray);
+                List<Weight> weights = Weight.parseWeights(jsonArray);
+                activity.parseWeights(weights);
             }
         };
     }
 
+    public static Emitter.Listener createNewImageListener(final HomeActivity activity){
+        return new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                    JSONArray jsonArray = (JSONArray)args[0];
+                activity.loadInitialImagesFromServer(jsonArray);
+            }
+        };
+    }
+
+    public static Emitter.Listener createNewAdditionImageListener(final HomeActivity activity){
+        return new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                JSONArray jsonArray = (JSONArray)args[0];
+                activity.loadMoreImages(jsonArray);
+            }
+        };
+    }
+
+    public static Emitter.Listener createNewWeightListener(final HomeActivity homeActivity){
+        return new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                System.out.println("Yeee");
+                JSONObject jsonObject = (JSONObject) args[0];
+                homeActivity.loadWeightPopup(jsonObject);
+            }
+        };
+    }
 
 }
