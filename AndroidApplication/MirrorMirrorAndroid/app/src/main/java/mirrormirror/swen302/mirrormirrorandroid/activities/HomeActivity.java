@@ -2,6 +2,7 @@ package mirrormirror.swen302.mirrormirrorandroid.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -138,14 +139,24 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 startActivityForResult(intent, CAMERA_ACTIVITY_REQUEST_CODE);
             }
         } else if(item.getItemId() == R.id.input_weight){
-            //Popup weight input dialog
             InputWeightDialog iwd = new InputWeightDialog(this);
             iwd.show();
-        }
-        else if (drawerToggle.onOptionsItemSelected(item)) {
+        } else if(item.getItemId() == R.id.logout) {
+            logout();
+        } else if (drawerToggle.onOptionsItemSelected(item)) {
+
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void logout(){
+        SharedPreferences sharedPreferences = this.getSharedPreferences(this.getString(R.string.login_details), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove("uid");
+        editor.apply();
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -219,15 +230,16 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     public void loadWeightPopup(JSONObject object){
         try {
             final Double weight = object.getDouble("weight");
+            final Double bmi = object.getDouble("bmi");
             System.out.println(weight);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if(HomeActivity.this.popup == null || !HomeActivity.this.popup.isShowing()) {
-                        HomeActivity.this.popup = new WeightPopupDialog(HomeActivity.this, weight);
+                        HomeActivity.this.popup = new WeightPopupDialog(HomeActivity.this, weight, bmi);
                         popup.show();
                     }else{
-                        popup.updateWeight(weight);
+                        popup.updateValues(weight, bmi);
                     }
                 }
             });
