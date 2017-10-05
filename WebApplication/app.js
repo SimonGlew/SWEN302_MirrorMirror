@@ -74,31 +74,33 @@ io.on('connection', function(socket) {
 		var uid = data.uid;
 		var numDays = data.numDays;
 		println("uid " + uid + " , numDays " + numDays);
-		db.getPreviousWeights(uid, numDays, function(results){
-			if(results.length > 0){
-				var dataToSend = [];
-				var prevDay = results[0].DateTime.substring(0, 10);
-				var dayWeight = 0;
-				var countOfWeights = 0;
+		db.getLatestHeight(uid, function(heightResults){
+			db.getPreviousWeights(uid, numDays, function(results){
+				if(results.length > 0){
+					var dataToSend = [];
+					var prevDay = results[0].DateTime.substring(0, 10);
+					var dayWeight = 0;
+					var countOfWeights = 0;
 
-				for(var i = 0; i < results.length; i++){
-					var event = results[i];
-					if(event.DateTime.substring(0, 10) === prevDay){
-						dayWeight += event.Weight;
-						countOfWeights ++;
-					}else{
-						var weight = dayWeight / countOfWeights;
-						dataToSend.push({'date' : prevDay, 'weight' : weight});
-						dayWeight = event.Weight;
-						countOfWeights = 1;
+					for(var i = 0; i < results.length; i++){
+						var event = results[i];
+						if(event.DateTime.substring(0, 10) === prevDay){
+							dayWeight += event.Weight;
+							countOfWeights ++;
+						}else{
+							var weight = dayWeight / countOfWeights;
+							dataToSend.push({'date' : prevDay, 'weight' : weight});
+							dayWeight = event.Weight;
+							countOfWeights = 1;
+						}
 					}
-					prevDay = event.DateTime.substring(0, 10);
+					var weight = dayWeight / countOfWeights;
+					var height = heightResults[0].height;
+					var bmi = getBMI(weight, height);
+					dataToSend.push({'date' : prevDay, 'weight' : weight, 'bmi': bmi, 'height': height});
+					socket.emit(requestWeightsSuccess, dataToSend);
 				}
-				var weight = dayWeight / countOfWeights;
-				dataToSend.push({'date' : prevDay, 'weight' : weight, 'bmi': 25, 'height': 180});
-				//past 7 days of weights, could have more than 1 per day, has rows of (datetime, weight)
-				socket.emit(requestWeightsSuccess, dataToSend);
-			}
+			});
 		});
 	});
 
@@ -115,10 +117,14 @@ io.on('connection', function(socket) {
 		var uid = data.uid;
 		var weight = data.weight;
 		db.saveWeight(uid, new Date(), weight);
-		println("Send to android id " + androidId)
-		io.to(androidId).emit(weightSaved, {
-			'weight': weight,
-			'bmi': 25
+		db.getLatestHeight(uid, function(results){
+			var height = results[0].height;
+			var bmi = getBMI(weight, height);
+			println("Send to android id " + androidId)
+			io.to(androidId).emit(weightSaved, {
+				'weight': weight,
+				'bmi': bmi
+			});
 		});
 	});
 
@@ -174,6 +180,10 @@ function getStringFromImage(filepath){
 	var bitmap = fs.readFileSync(filepath);
 	return new Buffer(bitmap).toString('base64');
 };
+
+function getBMI(weight, height){
+	return weight / (height * height);
+}
 
 function getCurrentDate() {
 	var currentDate = new Date();
