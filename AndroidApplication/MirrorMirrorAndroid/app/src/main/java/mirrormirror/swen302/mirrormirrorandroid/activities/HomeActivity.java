@@ -229,15 +229,16 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     public void loadWeightPopup(JSONObject object){
         try {
             final Double weight = object.getDouble("weight");
+            final Double bmi = object.getDouble("bmi");
             System.out.println(weight);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if(HomeActivity.this.popup == null || !HomeActivity.this.popup.isShowing()) {
-                        HomeActivity.this.popup = new WeightPopupDialog(HomeActivity.this, weight);
+                        HomeActivity.this.popup = new WeightPopupDialog(HomeActivity.this, weight, bmi);
                         popup.show();
                     }else{
-                        popup.updateWeight(weight);
+                        popup.updateValues(weight, bmi);
                     }
                 }
             });
