@@ -30,6 +30,7 @@ import java.util.List;
 import mirrormirror.swen302.mirrormirrorandroid.R;
 import mirrormirror.swen302.mirrormirrorandroid.adapters.HorizontalAdapter;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.ImageStorageManager;
+import mirrormirror.swen302.mirrormirrorandroid.utilities.InputWeightDialog;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.WeightPopupDialog;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.PermissionRequester;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.ServerController;
@@ -138,8 +139,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             }
         } else if(item.getItemId() == R.id.input_weight){
             //Popup weight input dialog
-            //WeightPopupDialog iwd = new WeightPopupDialog(this);
-            //iwd.show();
+            InputWeightDialog iwd = new InputWeightDialog(this);
+            iwd.show();
         }
         else if (drawerToggle.onOptionsItemSelected(item)) {
             return true;
