@@ -29,12 +29,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
 
+        ServerController.setConnectionListener(this);
+
         startHomeActivity();
 
         Button login = (Button) findViewById(R.id.login_button);
         login.setOnClickListener(this);
-
-        ServerController.setSocketLoginListener(this);
     }
 
     public void startHomeActivity(){
@@ -75,6 +75,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
             });
         }
+    }
+
+    public void onConnection(){
+        ServerController.sendAndroidIdEvent(this);
     }
 
 }

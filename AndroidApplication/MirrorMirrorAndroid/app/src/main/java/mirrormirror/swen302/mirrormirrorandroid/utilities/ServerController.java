@@ -149,6 +149,12 @@ public class ServerController {
         socket.emit("android connection event");
     }
 
+    public static void setConnectionListener(LoginActivity loginActivity){
+        Socket socket = SocketSingleton.getInstance(loginActivity).getSocket();
+        Emitter.Listener onConnection = createConnectionListener(loginActivity);
+        socket.on(Socket.EVENT_CONNECT, onConnection);
+    }
+
     public static void setSocketListeners(HomeActivity context){
         Socket socket = SocketSingleton.getInstance(context).getSocket();
 
@@ -203,6 +209,15 @@ public class ServerController {
             @Override
             public void call(Object... args) {
                 homeActivity.onConnection();
+            }
+        };
+    }
+
+    public static Emitter.Listener createConnectionListener(final LoginActivity loginActivity){
+        return new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                loginActivity.onConnection();
             }
         };
     }

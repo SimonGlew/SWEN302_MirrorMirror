@@ -46,7 +46,8 @@ public class WeightPopupDialog extends AlertDialog {
 
         weightTextView = (TextView) findViewById(R.id.weight_label);
         weightTextView.setText(this.weight + " kg");
-
+        bmiTextView = (TextView) findViewById(R.id.bmi_label);
+        bmiTextView.setText(this.bmi+"");
     }
 
     public static Double roundWeight(Double w){
