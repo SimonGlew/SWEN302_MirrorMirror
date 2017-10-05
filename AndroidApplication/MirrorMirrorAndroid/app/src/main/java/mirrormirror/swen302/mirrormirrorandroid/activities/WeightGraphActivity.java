@@ -73,8 +73,15 @@ public class WeightGraphActivity extends AppCompatActivity {
         graphButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(graphtype == GRAPHTYPE.BAR) graphtype = GRAPHTYPE.LINE;
-                else if (graphtype == GRAPHTYPE.LINE) graphtype = GRAPHTYPE.BAR;
+                if(graphtype == GRAPHTYPE.BAR){
+                    graphButton.setText("Bar Chart");
+                    graphtype = GRAPHTYPE.LINE;
+                }
+                else if (graphtype == GRAPHTYPE.LINE){
+                    graphButton.setText("Line Chart");
+
+                    graphtype = GRAPHTYPE.BAR;
+                }
                 makeGraph();
             }
         });
