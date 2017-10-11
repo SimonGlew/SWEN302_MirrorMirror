@@ -35,7 +35,7 @@
         if(response.uid == -1){
           $('#errLabel').text("Incorrect Username or Password");
         }else{
-          window.location = "http://localhost:3000/home/" + response.uid;
+          window.location = "home/" + response.uid;
         }
       })
     });
