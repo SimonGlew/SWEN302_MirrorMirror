@@ -41,8 +41,36 @@ function saveWeight(uid, datetime, weight, callback){
 	}
 }
 
+function saveHeight(uid, datetime, height, callback){
+	height = height.toFixed(1);
+	var stmt = db.prepare('INSERT INTO heights(UID, DateTime, Height) VALUES (?, ?, ?)');
+	stmt.run(uid, formatDateTime(datetime), height);
+	stmt.finalize();
+	if(callback){
+		callback();
+	}
+}
+
 function getPreviousWeights(uid, numDays, callback){
-	db.all("SELECT datetime, weight FROM weights WHERE DateTime > (SELECT DATETIME('now', '-" + (numDays - 1) + " day')) AND uid = " + uid + " ORDER BY DateTime DESC", function(err, results){
+	db.all("SELECT datetime, weight FROM weights WHERE DateTime > (SELECT DATETIME('now', '-" + (numDays - 1) + " day')) AND uid = " + uid, function(err, results){
+	//db.all("SELECT datetime, weight FROM weights WHERE DateTime > (SELECT DATETIME('now', '-" + (numDays - 1) + " day')) AND uid = " + uid + " ORDER BY DateTime DESC", function(err, results){
+		console.log("results: " + results);
+		if(err){
+			console.log(err);
+		}else{
+			callback(results);
+		}
+	});
+}
+
+function getFullName(uid, callback){
+	db.all("SELECT FirstName, LastName FROM users WHERE uid = " + uid, function(err, results){
+		callback(results[0].FirstName + " " + results[0].LastName);
+	});
+}
+
+function getPreviousHeights(uid, numDays, callback){
+	db.all("SELECT datetime, height FROM heights WHERE DateTime > (SELECT DATETIME('now', '-" + (numDays - 1) + " day')) AND uid = " + uid + " ORDER BY DateTime DESC", function(err, results){
 		console.log(results);
 		if(err){
 			console.log(err);
@@ -52,8 +80,30 @@ function getPreviousWeights(uid, numDays, callback){
 	});
 }
 
+function getLatestHeight(uid, callback){
+	db.all("SELECT TOP 1 height FROM heights WHERE uid = " + uid + "ORDER BY DateTime DESC", function(err, results){
+		if(err){
+			console.log("ERROR: " + err);
+		}else{
+			callback(results);
+		}
+	})
+}
+
+function getHeightAtDay(uid, date, callback){
+	//TODO: GET THE LAST RECORDED HEIGHT OF THE USER BEFORE THIS DATE
+	/*db.all("SELECT datetime, height FROM heights WHERE DateTime > (SELECT DATETIME('now', '-" + (numDays - 1) + " day')) AND uid = " + uid + " ORDER BY DateTime DESC", function(err, results){
+		console.log(results);
+		if(err){
+			console.log(err);
+		}else{
+			callback(results);
+		}
+	});*/
+}
+
 function checkLoginDetails(username, password, callback){
-	db.all("SELECT UID FROM Users WHERE Username = " + username + " AND Password = " + password, function(err, results){
+	db.all("SELECT UID FROM Users WHERE Username = '" + username + "' AND Password = '" + password + "'", function(err, results){
 		if(err){
 			console.log(err);
 		}else{
@@ -64,6 +114,12 @@ function checkLoginDetails(username, password, callback){
 			}
 		}
 	});
+}
+
+function saveFlow(uid, datetime, peakflow){
+	var stmt = db.prepare('INSERT INTO peakflow(UID, DateTime, PeakFlow) VALUES (?, ?, ?)');
+	stmt.run(uid, formatDateTime(datetime), peakflow);
+	stmt.finalize();
 }
 
 function openDatabase(dbname, callback){
@@ -80,9 +136,14 @@ function openDatabase(dbname, callback){
 	});
 	db.savePhoto = savePhoto;
 	db.saveWeight = saveWeight;
+	db.saveHeight = saveHeight;
 	db.getImages = getImages;
 	db.checkLoginDetails = checkLoginDetails;
+	db.getFullName = getFullName;
 	db.getPreviousWeights = getPreviousWeights;
+	db.getPreviousHeights = getPreviousHeights;
+	db.getHeightAtDay = getHeightAtDay;
+	db.saveFlow = saveFlow;
 	if(callback){
 		callback();
 	}

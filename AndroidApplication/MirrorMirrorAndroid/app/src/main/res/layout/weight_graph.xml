@@ -24,7 +24,7 @@
             android:layout_marginTop="5dp"
             android:layout_width="130dp"
             android:layout_height="50dp"
-            android:text="Switch Chart"
+            android:text="Line Chart"
             android:layout_alignParentEnd="true"/>
 
     </RelativeLayout>

@@ -14,5 +14,21 @@
         android:title="TakeImage"
         android:icon="@drawable/ic_add_a_photo_white_24px"/>
 
+    <item
+        android:id="@+id/settings"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_settings_white"
+        android:title="Settings">
+
+        <menu>
+            <item
+                android:id="@+id/logout"
+                app:showAsAction="always"
+                android:title="Logout">
+            </item>
+        </menu>
+
+    </item>
+
 
 </menu>

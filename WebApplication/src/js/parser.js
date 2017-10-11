@@ -1,4 +1,4 @@
-var parser;
+var parser = {};
 
 function toDatabaseDate(stringDate){
   //WANTING: YYYY-MM-DD HH:MM:SS
@@ -7,7 +7,7 @@ function toDatabaseDate(stringDate){
   var dateSplit = firstSplit[0].split('-');
   var timeSplit = firstSplit[1].split('-');
 
-  return new Date(dateSplit[0], dateSplit[1], dateSplit[2], timeSplit[0], timeSplit[1], timeSplit[2], 0);
+  return new Date(dateSplit[0], dateSplit[1] - 1, dateSplit[2], timeSplit[0], timeSplit[1], timeSplit[2], 0);
 }
 parser.toDatabaseDate = toDatabaseDate;
 
@@ -19,7 +19,7 @@ function toAndroidDate(date){
   var dateSplit = firstSplit[0].split('-');
   var timeSplit = firstSplit[1].split('-');
 
-  return dateSplit[0] + '-' + dateSplit[1] + '-' + dateSplit[2] + '_' + timeSplit[0] + '-' + timeSplit[1] + '-' + timeSplit[2];
+  return dateSplit[0] + '-' + (dateSplit[1] + 1) + '-' + dateSplit[2] + '_' + timeSplit[0] + '-' + timeSplit[1] + '-' + timeSplit[2];
 }
 parser.toAndroidDate = toAndroidDate;
 
