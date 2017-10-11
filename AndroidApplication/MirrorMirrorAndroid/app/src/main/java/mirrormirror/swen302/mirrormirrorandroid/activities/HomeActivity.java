@@ -51,7 +51,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     RecyclerView recyclerView;
     HorizontalAdapter horizontalAdapter;
 
-    List<String> filePaths;
+    private List<String> filePaths;
     boolean isLoadingImages;
 
     @Override
@@ -74,6 +74,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         initialLoadImages();
 
+    }
+
+    public List<String> getFilePaths(){
+        return filePaths;
     }
 
     @Override
