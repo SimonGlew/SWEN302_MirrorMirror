@@ -71,6 +71,7 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on(peakFlowEvent, function(data){
+		println("got new peak flow event");
 		var uid = data.uid;
 		var peakFlow = data.peak_flow;
 

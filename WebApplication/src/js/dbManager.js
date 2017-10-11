@@ -118,7 +118,7 @@ function checkLoginDetails(username, password, callback){
 
 function saveFlow(uid, datetime, peakflow){
 	var stmt = db.prepare('INSERT INTO peakflow(UID, DateTime, PeakFlow) VALUES (?, ?, ?)');
-	stmt.run(uid, formatDateTime(datetime), height);
+	stmt.run(uid, formatDateTime(datetime), peakflow);
 	stmt.finalize();
 }
 
