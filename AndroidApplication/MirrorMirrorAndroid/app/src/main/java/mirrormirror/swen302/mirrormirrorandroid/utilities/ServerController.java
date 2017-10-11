@@ -88,6 +88,24 @@ public class ServerController {
         socket.emit("weight event", messageObject);
     }
 
+    public static void sendPeakFlow(int peakFlow, String datetime, Context context){
+        Socket socket = SocketSingleton.getInstance(context).getSocket();
+        if(!socket.connected()) {
+            socket.connect();
+        }
+
+        JSONObject messageObject = new JSONObject();
+        try {
+            messageObject.put("uid", getUID(context));
+            messageObject.put("peak_flow", peakFlow);
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        socket.emit("peak_flow event", messageObject);
+    }
+
     public static void sendWeightsRequest(Context context, int numberOfDays){
         Socket socket = SocketSingleton.getInstance(context).getSocket();
         if(!socket.connected()){
@@ -149,12 +167,6 @@ public class ServerController {
         socket.emit("android connection event");
     }
 
-    public static void setConnectionListener(LoginActivity loginActivity){
-        Socket socket = SocketSingleton.getInstance(loginActivity).getSocket();
-        Emitter.Listener onConnection = createConnectionListener(loginActivity);
-        socket.on(Socket.EVENT_CONNECT, onConnection);
-    }
-
     public static void setSocketListeners(HomeActivity context){
         Socket socket = SocketSingleton.getInstance(context).getSocket();
 
@@ -179,6 +191,9 @@ public class ServerController {
 
         Emitter.Listener onLoginMessage = createLoginListener(context);
         socket.on("login response event", onLoginMessage);
+
+        Emitter.Listener onConnection = createConnectionListener(context);
+        socket.on(Socket.EVENT_CONNECT, onConnection);
     }
 
     public static void setSocketWeightListener(WeightGraphActivity context){
@@ -186,8 +201,6 @@ public class ServerController {
 
         Emitter.Listener onWeightMessage = createWeightGraphListener(context);
         socket.on("request weights success event", onWeightMessage);
-
-
     }
 
     public static Emitter.Listener createLoginListener(final LoginActivity loginActivity){

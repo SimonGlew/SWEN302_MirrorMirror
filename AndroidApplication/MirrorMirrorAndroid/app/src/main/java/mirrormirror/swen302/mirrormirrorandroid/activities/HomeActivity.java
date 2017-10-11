@@ -31,6 +31,7 @@ import java.util.List;
 import mirrormirror.swen302.mirrormirrorandroid.R;
 import mirrormirror.swen302.mirrormirrorandroid.adapters.HorizontalAdapter;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.ImageStorageManager;
+import mirrormirror.swen302.mirrormirrorandroid.utilities.InputPeakFlowDialog;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.InputWeightDialog;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.WeightPopupDialog;
 import mirrormirror.swen302.mirrormirrorandroid.utilities.PermissionRequester;
@@ -142,13 +143,15 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 Intent intent = new Intent(this, CameraPreviewActivity.class);
                 startActivityForResult(intent, CAMERA_ACTIVITY_REQUEST_CODE);
             }
+        } else if(item.getItemId() == R.id.input_peak_flow){
+            InputPeakFlowDialog ipfd = new InputPeakFlowDialog(this);
+            ipfd.show();
         } else if(item.getItemId() == R.id.input_weight){
             InputWeightDialog iwd = new InputWeightDialog(this);
             iwd.show();
         } else if(item.getItemId() == R.id.logout) {
             logout();
         } else if (drawerToggle.onOptionsItemSelected(item)) {
-
             return true;
         }
         return super.onOptionsItemSelected(item);
