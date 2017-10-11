@@ -29,6 +29,8 @@ var requestLastImagesSuccess = 'request last images success event';
 var requestImagesSuccess = 'request images success event'
 var requestWeightsSuccess = 'request weights success event'
 var weightSaved = 'weight saved event'
+var registrationEvent = 'registration event'
+var registrationResponse = 'register response event'
 
 server.listen(port, function() {
 	console.log('Listening on port ' + port);
@@ -67,6 +69,37 @@ io.on('connection', function(socket) {
 	socket.on(piConnection, function(data){
 		piId = socket.id;
 		println("pi connection on id " + piId)
+	});
+
+	socket.on(registrationEvent, function(data){
+		console.log(data);
+		var username = data.username;
+		var password = data.password;
+		var firstName = data.firstName;
+		var lastName = data.lastName;
+		var height = parseFloat(data.height);
+		if(username.length == 0 || password.length == 0 || firstName.length == 0 || lastName.length == 0 || height.length == 0){
+			socket.emit(registrationResponse, {'success': false, 'message': 'Please complete all fields.'})
+			return;
+		}
+		if(isNaN(height)){
+			socket.emit(registrationResponse, {'success': false, 'message': 'Please enter a valid height'})
+			return;
+		}
+		db.getUID(username, function(results){
+			if(results.length != 0){
+				socket.emit(registrationResponse, {'success': false, 'message': 'Username is not available'})
+			}else{
+				db.newAccount(username, password, firstName, lastName, height, function(results){
+					console.log(results);
+					socket.emit(registrationResponse, {'success': true, 'uid': results[0].UID});
+					db.saveHeight(results[0].UID, new Date(), height);
+				});
+			}
+		});
+
+
+
 	});
 
 	socket.on(requestWeights, function(data){

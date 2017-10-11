@@ -81,25 +81,13 @@ function getPreviousHeights(uid, numDays, callback){
 }
 
 function getLatestHeight(uid, callback){
-	db.all("SELECT TOP 1 height FROM heights WHERE uid = " + uid + "ORDER BY DateTime DESC", function(err, results){
+	db.all("SELECT height FROM heights WHERE uid = " + uid + " ORDER BY DateTime DESC LIMIT 1", function(err, results){
 		if(err){
 			console.log("ERROR: " + err);
 		}else{
 			callback(results);
 		}
 	})
-}
-
-function getHeightAtDay(uid, date, callback){
-	//TODO: GET THE LAST RECORDED HEIGHT OF THE USER BEFORE THIS DATE
-	/*db.all("SELECT datetime, height FROM heights WHERE DateTime > (SELECT DATETIME('now', '-" + (numDays - 1) + " day')) AND uid = " + uid + " ORDER BY DateTime DESC", function(err, results){
-		console.log(results);
-		if(err){
-			console.log(err);
-		}else{
-			callback(results);
-		}
-	});*/
 }
 
 function checkLoginDetails(username, password, callback){
@@ -113,6 +101,21 @@ function checkLoginDetails(username, password, callback){
 				callback(results[0]);
 			}
 		}
+	});
+}
+
+function getUID(username, callback){
+	db.all("SELECT UID FROM Users WHERE Username = '" + username + "'", function(err, results){
+		callback(results);
+	});
+}
+
+function newAccount(username, password, firstname, lastname, height, callback){
+	var stmt = db.prepare('INSERT INTO users(LastName, FirstName, Username, Password) VALUES (?, ?, ?, ?)');
+	stmt.run(lastname, firstname, username, password);
+	stmt.finalize();
+	getUID(username, function(results){
+		callback(results);
 	});
 }
 
@@ -136,7 +139,9 @@ function openDatabase(dbname, callback){
 	db.getFullName = getFullName;
 	db.getPreviousWeights = getPreviousWeights;
 	db.getPreviousHeights = getPreviousHeights;
-	db.getHeightAtDay = getHeightAtDay;
+	db.getLatestHeight = getLatestHeight;
+	db.getUID = getUID;
+	db.newAccount = newAccount;
 	if(callback){
 		callback();
 	}
