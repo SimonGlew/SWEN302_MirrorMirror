@@ -116,6 +116,12 @@ function checkLoginDetails(username, password, callback){
 	});
 }
 
+function saveFlow(uid, datetime, peakflow){
+	var stmt = db.prepare('INSERT INTO peakflow(UID, DateTime, PeakFlow) VALUES (?, ?, ?)');
+	stmt.run(uid, formatDateTime(datetime), height);
+	stmt.finalize();
+}
+
 function openDatabase(dbname, callback){
 	db = new sqlite3.Database(dbname);
 	require('fs').readFile('./databaseCreatorScript.sql', function(err, script){
@@ -137,6 +143,7 @@ function openDatabase(dbname, callback){
 	db.getPreviousWeights = getPreviousWeights;
 	db.getPreviousHeights = getPreviousHeights;
 	db.getHeightAtDay = getHeightAtDay;
+	db.saveFlow = saveFlow;
 	if(callback){
 		callback();
 	}

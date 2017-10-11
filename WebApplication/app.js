@@ -29,6 +29,7 @@ var requestLastImagesSuccess = 'request last images success event';
 var requestImagesSuccess = 'request images success event'
 var requestWeightsSuccess = 'request weights success event'
 var weightSaved = 'weight saved event'
+var peakFlowEvent = 'peak_flow event'
 
 server.listen(port, function() {
 	console.log('Listening on port ' + port);
@@ -67,6 +68,13 @@ io.on('connection', function(socket) {
 	socket.on(piConnection, function(data){
 		piId = socket.id;
 		println("pi connection on id " + piId)
+	});
+
+	socket.on(peakFlowEvent, function(data){
+		var uid = data.uid;
+		var peakFlow = data.peak_flow;
+
+		db.saveFlow(uid, new Date(), peakFlow)
 	});
 
 	socket.on(requestWeights, function(data){
