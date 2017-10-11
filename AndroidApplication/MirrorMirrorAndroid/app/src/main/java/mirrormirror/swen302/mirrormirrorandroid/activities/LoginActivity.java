@@ -27,12 +27,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.login_activity);
-
-        ServerController.setConnectionListener(this);
-
+        //Checks for saved UserID, will skip this activity and start the HomeActivity if found.
         startHomeActivity();
-
+        //UserID not found, create LoginActivivty.
+        setContentView(R.layout.login_activity);
+        ServerController.setSocketLoginListener(this);
         Button login = (Button) findViewById(R.id.login_button);
         login.setOnClickListener(this);
     }
@@ -44,7 +43,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             startActivity(intent);
         }
     }
-
 
     @Override
     public void onClick(View v) {
