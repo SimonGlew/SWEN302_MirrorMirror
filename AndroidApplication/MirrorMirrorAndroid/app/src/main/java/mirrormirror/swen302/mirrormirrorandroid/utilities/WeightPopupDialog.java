@@ -23,13 +23,13 @@ public class WeightPopupDialog extends AlertDialog {
     public WeightPopupDialog(@NonNull Context context, Double w, Double b) {
         super(context);
         this.weight = roundWeight(w);
-        this.bmi = b;
+        this.bmi = roundWeight(b);
     }
 
     public void updateValues(Double w, Double b){
         this.weight = roundWeight(w);
         this.weightTextView.setText(this.weight + " kg");
-        this.bmi = b;
+        this.bmi = roundWeight(b);
         this.bmiTextView.setText(this.bmi+"");
     }
 
