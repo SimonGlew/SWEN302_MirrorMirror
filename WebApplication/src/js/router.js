@@ -2,6 +2,10 @@ var express = require('express');
 var router = express.Router();
 var db = require('./dbManager')('MirrorMirror');
 
+router.get('/', function(requ, res){
+	res.redirect('/login');
+});
+
 router.get('/home', function(req, res) {
 		res.redirect('/login');
 });
@@ -31,12 +35,14 @@ router.get('/home/:uid/weights/:days', function(req, res) {
 		});
 });
 
-
-
 router.get('/login', function(req, res) {
 	res.render('login', {
-		title: 'About'
 	});
+});
+
+router.get('/register', function(req, res){
+	res.render('register', {
+	})
 });
 
 module.exports = router;
