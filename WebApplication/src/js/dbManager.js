@@ -119,6 +119,12 @@ function newAccount(username, password, firstname, lastname, height, callback){
 	});
 }
 
+function saveFlow(uid, datetime, peakflow){
+	var stmt = db.prepare('INSERT INTO peakflow(UID, DateTime, PeakFlow) VALUES (?, ?, ?)');
+	stmt.run(uid, formatDateTime(datetime), peakflow);
+	stmt.finalize();
+}
+
 function openDatabase(dbname, callback){
 	db = new sqlite3.Database(dbname);
 	require('fs').readFile('./databaseCreatorScript.sql', function(err, script){
@@ -142,6 +148,7 @@ function openDatabase(dbname, callback){
 	db.getLatestHeight = getLatestHeight;
 	db.getUID = getUID;
 	db.newAccount = newAccount;
+	db.saveFlow = saveFlow;
 	if(callback){
 		callback();
 	}

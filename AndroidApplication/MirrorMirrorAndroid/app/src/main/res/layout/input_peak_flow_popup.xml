@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:textSize="24dp"
-        android:text="Record Weight"/>
+        android:text="Record Peak Flow"/>
 
     <LinearLayout
         android:layout_width="500dp"
@@ -23,19 +23,7 @@
             android:layout_weight="0.7"
             android:padding="5dp">
             <com.shawnlin.numberpicker.NumberPicker
-                android:id="@+id/weight_picker_left"
-                android:layout_width="0dp"
-                android:layout_weight="0.5"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:textSize="40dp"
-                android:text="."/>
-            <com.shawnlin.numberpicker.NumberPicker
-                android:id="@+id/weight_picker_right"
+                android:id="@+id/peak_flow_picker"
                 android:layout_width="0dp"
                 android:layout_weight="0.5"
                 android:layout_height="wrap_content"
@@ -45,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:textSize="24dp"
-                android:text="KG"/>
+                android:text="L/min"/>
         </LinearLayout>
 
         <LinearLayout

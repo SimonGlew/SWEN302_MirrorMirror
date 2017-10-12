@@ -10,7 +10,6 @@ import com.shawnlin.numberpicker.NumberPicker;
 
 import java.text.DecimalFormat;
 
-
 import mirrormirror.swen302.mirrormirrorandroid.R;
 
 
@@ -18,31 +17,26 @@ import mirrormirror.swen302.mirrormirrorandroid.R;
  * Created by hayandr1 on 29/08/17.
  */
 
-public class InputWeightDialog extends AlertDialog implements View.OnClickListener{
-    private static final int maxWeight = 200;
-    private static final double subKGStepping = 0.1;
-    private static final DecimalFormat dF = new DecimalFormat(".##");
+public class InputPeakFlowDialog extends AlertDialog implements View.OnClickListener{
+    private static final int maxPF = 800;
+    private static final int minPF = 50;
 
-    private static NumberPicker leftPicker;
-    private static NumberPicker rightPicker;
+    private static NumberPicker peakFlowPicker;
 
-    public InputWeightDialog(Context context){
+    public InputPeakFlowDialog(Context context){
         super(context);
     }
 
     void populateSpinnerAdapters(){
-        leftPicker = (NumberPicker) findViewById(R.id.weight_picker_left);
-        rightPicker = (NumberPicker) findViewById(R.id.weight_picker_right);
-        leftPicker.setMaxValue(maxWeight);
-        leftPicker.setMinValue(1);
-        rightPicker.setMinValue(0);
-        rightPicker.setMaxValue(9);
+        peakFlowPicker = (NumberPicker) findViewById(R.id.peak_flow_picker);
+        peakFlowPicker.setMinValue(minPF);
+        peakFlowPicker.setMaxValue(maxPF);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.input_weight_popup);
+        setContentView(R.layout.input_peak_flow_popup);
 
         populateSpinnerAdapters();
         Button cancel = (Button) findViewById(R.id.cancel_button);
@@ -56,9 +50,8 @@ public class InputWeightDialog extends AlertDialog implements View.OnClickListen
         if(v.getId() == R.id.cancel_button){
             cancel();
         } else if(v.getId() == R.id.submit_button){
-            float weightVal = leftPicker.getValue();
-            weightVal += (rightPicker.getValue())/((int)(1/subKGStepping));
-            ServerController.sendWeight(weightVal, DateTimeManager.getDatetimeAsString(), getContext());
+            int peakFlowVal = peakFlowPicker.getValue();
+            ServerController.sendPeakFlow(peakFlowVal, DateTimeManager.getDatetimeAsString(), getContext());
             cancel();
         }
     }
