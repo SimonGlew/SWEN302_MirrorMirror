@@ -52,9 +52,8 @@ function saveHeight(uid, datetime, height, callback){
 }
 
 function getPreviousWeights(uid, numDays, callback){
-	db.all("SELECT datetime, weight FROM weights WHERE DateTime > (SELECT DATETIME('now', '-" + (numDays - 1) + " day')) AND uid = " + uid, function(err, results){
+	db.all("SELECT datetime, weight FROM weights WHERE DateTime > (SELECT DATETIME('now', '-" + (numDays - 1) + " day')) AND uid = " + uid + " ORDER BY DateTime DESC", function(err, results){
 	//db.all("SELECT datetime, weight FROM weights WHERE DateTime > (SELECT DATETIME('now', '-" + (numDays - 1) + " day')) AND uid = " + uid + " ORDER BY DateTime DESC", function(err, results){
-		console.log("results: " + results);
 		if(err){
 			console.log(err);
 		}else{

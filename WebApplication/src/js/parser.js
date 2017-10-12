@@ -15,11 +15,7 @@ function toAndroidDate(date){
   //GOT: YYYY-MM-DD HH:MM:SS
   //WANTING: yyyy-mm-dd_hh-MM-ss
 
-  var firstSplit = date.split(' ');
-  var dateSplit = firstSplit[0].split('-');
-  var timeSplit = firstSplit[1].split('-');
-
-  return dateSplit[0] + '-' + (dateSplit[1] + 1) + '-' + dateSplit[2] + '_' + timeSplit[0] + '-' + timeSplit[1] + '-' + timeSplit[2];
+  return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + '_' + (date.getHours() + 1) + '-' + (date.getMinutes() + 1) + '-' + (date.getSeconds() + 1);
 }
 parser.toAndroidDate = toAndroidDate;
 

@@ -12,7 +12,7 @@ var db = require('./src/js/dbManager')('MirrorMirror');
 
 var port = 3000;
 
-var androidId;
+var androidId = [];
 var piId;
 
 var androidConnection = 'android connection event'
@@ -63,8 +63,8 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on(androidConnection, function(data){
-		androidId = socket.id;
-		println("android connection on id " + androidId);
+		androidId.push(socket.id);
+		println("android connection on id " + socket.id);
 	});
 
 	socket.on(piConnection, function(data){
@@ -88,7 +88,9 @@ io.on('connection', function(socket) {
 		db.getLatestHeight(uid, function(heightResults){
 			db.getPreviousWeights(uid, numDays, function(results){
 				if(results.length > 0){
+					var height = heightResults[0].height;
 					var dataToSend = [];
+					var bmi = 0;
 					var prevDay = results[0].DateTime.substring(0, 10);
 					var dayWeight = 0;
 					var countOfWeights = 0;
@@ -100,14 +102,15 @@ io.on('connection', function(socket) {
 							countOfWeights ++;
 						}else{
 							var weight = dayWeight / countOfWeights;
-							dataToSend.push({'date' : prevDay, 'weight' : weight});
+							bmi = getBMI(weight, height);
+							dataToSend.push({'date' : prevDay, 'weight' : weight, 'bmi': bmi, 'height': height});
 							dayWeight = event.Weight;
+							prevDay = results[i].DateTime.substring(0, 10);
 							countOfWeights = 1;
 						}
 					}
 					var weight = dayWeight / countOfWeights;
-					var height = heightResults[0].height;
-					var bmi = getBMI(weight, height);
+					bmi = getBMI(weight, height);
 					dataToSend.push({'date' : prevDay, 'weight' : weight, 'bmi': bmi, 'height': height});
 					socket.emit(requestWeightsSuccess, dataToSend);
 				}
@@ -154,45 +157,10 @@ io.on('connection', function(socket) {
 		db.saveFlow(uid, new Date(), peakFlow)
 	});
 
-	socket.on(requestWeights, function(data){
-		println("Previous weights event received");
-		var uid = data.uid;
-		var numDays = data.numDays;
-		println("uid " + uid + " , numDays " + numDays);
-		db.getLatestHeight(uid, function(heightResults){
-			db.getPreviousWeights(uid, numDays, function(results){
-				if(results.length > 0){
-					var dataToSend = [];
-					var prevDay = results[0].DateTime.substring(0, 10);
-					var dayWeight = 0;
-					var countOfWeights = 0;
-
-					for(var i = 0; i < results.length; i++){
-						var event = results[i];
-						if(event.DateTime.substring(0, 10) === prevDay){
-							dayWeight += event.Weight;
-							countOfWeights ++;
-						}else{
-							var weight = dayWeight / countOfWeights;
-							dataToSend.push({'date' : prevDay, 'weight' : weight});
-							dayWeight = event.Weight;
-							countOfWeights = 1;
-						}
-					}
-					var weight = dayWeight / countOfWeights;
-					var height = heightResults[0].height;
-					var bmi = getBMI(weight, height);
-					dataToSend.push({'date' : prevDay, 'weight' : weight, 'bmi': bmi, 'height': height});
-					socket.emit(requestWeightsSuccess, dataToSend);
-				}
-			});
-		});
-	});
-
 	socket.on(imageEvent, function(data) {
 		println("New image event received");
 		var uid = data.uid;
-		var datetime = parser.toDatabaseDate(data.datetime);
+		var datetime = data.datetime;
 		var imageString = data.image;
 		saveImage(imageString, uid, datetime);
 	});
@@ -203,13 +171,16 @@ io.on('connection', function(socket) {
 		var weight = data.weight;
 		db.saveWeight(uid, new Date(), weight);
 		db.getLatestHeight(uid, function(results){
-			var height = results[0].height;
+			var height = results[0].Height;
 			var bmi = getBMI(weight, height);
-			println("Send to android id " + androidId)
-			io.to(androidId).emit(weightSaved, {
-				'weight': weight,
-				'bmi': bmi
-			});
+			for(var i = 0; i < androidId.length; i++){
+				println("Send to android id " + androidId[i])
+				println("weight: " + weight + " bmi: " + bmi);
+				io.to(androidId[i]).emit(weightSaved, {
+					'weight': weight,
+					'bmi': bmi
+				});
+			}
 		});
 	});
 
@@ -267,7 +238,7 @@ function getStringFromImage(filepath){
 };
 
 function getBMI(weight, height){
-	return weight / (height * height);
+	return parseFloat(weight) / (parseFloat(height / 100) * parseFloat(height / 100));
 }
 
 function getCurrentDate() {
