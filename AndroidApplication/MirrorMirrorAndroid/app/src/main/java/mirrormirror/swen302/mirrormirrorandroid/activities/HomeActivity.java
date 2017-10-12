@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.icu.text.DecimalFormat;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -236,8 +237,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     public void loadWeightPopup(JSONObject object){
         try {
-            final Double weight = object.getDouble("weight");
-            final Double bmi = object.getDouble("bmi");
+            final double weight = object.getDouble("weight");
+
+            final double bmi = object.getDouble("bmi");
+
             System.out.println(weight);
             runOnUiThread(new Runnable() {
                 @Override
