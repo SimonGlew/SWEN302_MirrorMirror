@@ -104,8 +104,6 @@ function checkLoginDetails(username, password, callback){
 	});
 }
 
-<<<<<<< HEAD
-=======
 function getUID(username, callback){
 	db.all("SELECT UID FROM Users WHERE Username = '" + username + "'", function(err, results){
 		callback(results);
@@ -121,7 +119,6 @@ function newAccount(username, password, firstname, lastname, height, callback){
 	});
 }
 
->>>>>>> WebRegistration
 function saveFlow(uid, datetime, peakflow){
 	var stmt = db.prepare('INSERT INTO peakflow(UID, DateTime, PeakFlow) VALUES (?, ?, ?)');
 	stmt.run(uid, formatDateTime(datetime), peakflow);
@@ -148,13 +145,9 @@ function openDatabase(dbname, callback){
 	db.getFullName = getFullName;
 	db.getPreviousWeights = getPreviousWeights;
 	db.getPreviousHeights = getPreviousHeights;
-<<<<<<< HEAD
-	db.getHeightAtDay = getHeightAtDay;
-=======
 	db.getLatestHeight = getLatestHeight;
 	db.getUID = getUID;
 	db.newAccount = newAccount;
->>>>>>> WebRegistration
 	db.saveFlow = saveFlow;
 	if(callback){
 		callback();

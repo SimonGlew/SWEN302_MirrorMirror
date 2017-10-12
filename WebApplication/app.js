@@ -29,11 +29,8 @@ var requestLastImagesSuccess = 'request last images success event';
 var requestImagesSuccess = 'request images success event'
 var requestWeightsSuccess = 'request weights success event'
 var weightSaved = 'weight saved event'
-<<<<<<< HEAD
-=======
 var registrationEvent = 'registration event'
 var registrationResponse = 'register response event'
->>>>>>> WebRegistration
 var peakFlowEvent = 'peak_flow event'
 
 server.listen(port, function() {
@@ -75,7 +72,6 @@ io.on('connection', function(socket) {
 		println("pi connection on id " + piId)
 	});
 
-<<<<<<< HEAD
 	socket.on(peakFlowEvent, function(data){
 		println("got new peak flow event");
 		var uid = data.uid;
@@ -107,7 +103,20 @@ io.on('connection', function(socket) {
 							dataToSend.push({'date' : prevDay, 'weight' : weight});
 							dayWeight = event.Weight;
 							countOfWeights = 1;
-=======
+						}
+					}
+					var weight = dayWeight / countOfWeights;
+					var height = heightResults[0].height;
+					var bmi = getBMI(weight, height);
+					dataToSend.push({'date' : prevDay, 'weight' : weight, 'bmi': bmi, 'height': height});
+					socket.emit(requestWeightsSuccess, dataToSend);
+				}
+			});
+		});
+	});
+
+
+
 	socket.on(registrationEvent, function(data){
 		console.log(data);
 		var username = data.username;
@@ -137,140 +146,138 @@ io.on('connection', function(socket) {
 	});
 
 
+	socket.on(peakFlowEvent, function(data){
+		println("got new peak flow event");
+		var uid = data.uid;
+		var peakFlow = data.peak_flow;
 
-		socket.on(peakFlowEvent, function(data){
-			println("got new peak flow event");
-			var uid = data.uid;
-			var peakFlow = data.peak_flow;
+		db.saveFlow(uid, new Date(), peakFlow)
+	});
 
-			db.saveFlow(uid, new Date(), peakFlow)
-		});
+	socket.on(requestWeights, function(data){
+		println("Previous weights event received");
+		var uid = data.uid;
+		var numDays = data.numDays;
+		println("uid " + uid + " , numDays " + numDays);
+		db.getLatestHeight(uid, function(heightResults){
+			db.getPreviousWeights(uid, numDays, function(results){
+				if(results.length > 0){
+					var dataToSend = [];
+					var prevDay = results[0].DateTime.substring(0, 10);
+					var dayWeight = 0;
+					var countOfWeights = 0;
 
-		socket.on(requestWeights, function(data){
-			println("Previous weights event received");
-			var uid = data.uid;
-			var numDays = data.numDays;
-			println("uid " + uid + " , numDays " + numDays);
-			db.getLatestHeight(uid, function(heightResults){
-				db.getPreviousWeights(uid, numDays, function(results){
-					if(results.length > 0){
-						var dataToSend = [];
-						var prevDay = results[0].DateTime.substring(0, 10);
-						var dayWeight = 0;
-						var countOfWeights = 0;
-
-						for(var i = 0; i < results.length; i++){
-							var event = results[i];
-							if(event.DateTime.substring(0, 10) === prevDay){
-								dayWeight += event.Weight;
-								countOfWeights ++;
-							}else{
-								var weight = dayWeight / countOfWeights;
-								dataToSend.push({'date' : prevDay, 'weight' : weight});
-								dayWeight = event.Weight;
-								countOfWeights = 1;
-							}
->>>>>>> WebRegistration
+					for(var i = 0; i < results.length; i++){
+						var event = results[i];
+						if(event.DateTime.substring(0, 10) === prevDay){
+							dayWeight += event.Weight;
+							countOfWeights ++;
+						}else{
+							var weight = dayWeight / countOfWeights;
+							dataToSend.push({'date' : prevDay, 'weight' : weight});
+							dayWeight = event.Weight;
+							countOfWeights = 1;
 						}
-						var weight = dayWeight / countOfWeights;
-						var height = heightResults[0].height;
-						var bmi = getBMI(weight, height);
-						dataToSend.push({'date' : prevDay, 'weight' : weight, 'bmi': bmi, 'height': height});
-						socket.emit(requestWeightsSuccess, dataToSend);
 					}
-				});
-			});
-		});
-
-		socket.on(imageEvent, function(data) {
-			println("New image event received");
-			var uid = data.uid;
-			var datetime = parser.toDatabaseDate(data.datetime);
-			var imageString = data.image;
-			saveImage(imageString, uid, datetime);
-		});
-
-		socket.on(weightEvent, function(data) {
-			println("New weight event received");
-			var uid = data.uid;
-			var weight = data.weight;
-			db.saveWeight(uid, new Date(), weight);
-			db.getLatestHeight(uid, function(results){
-				var height = results[0].height;
-				var bmi = getBMI(weight, height);
-				println("Send to android id " + androidId)
-				io.to(androidId).emit(weightSaved, {
-					'weight': weight,
-					'bmi': bmi
-				});
-			});
-		});
-
-		socket.on(requestLastImages, function(data) {
-			println("Request for previous " + data.numImages + " images received.");
-			var uid = data.uid;
-			var offset = 0;
-			var numImages = data.numImages;
-			var images = db.getImages(uid, numImages, offset, function(results) {
-				var dataToSend = [];
-				for(index = 0; index < results.length; index++){
-					var imageString = getStringFromImage(results[index].FilePath);
-					var time = results[index].DateTime;
-					dataToSend.push({ 'imageString' : imageString, 'time' : time });
+					var weight = dayWeight / countOfWeights;
+					var height = heightResults[0].height;
+					var bmi = getBMI(weight, height);
+					dataToSend.push({'date' : prevDay, 'weight' : weight, 'bmi': bmi, 'height': height});
+					socket.emit(requestWeightsSuccess, dataToSend);
 				}
-				println("Emiting images");
-				socket.emit(requestLastImagesSuccess, dataToSend);
-			});
-		});
-
-		socket.on(requestImages, function(data) {
-			println("Request for previous " + data.numImages + " images received.");
-			var uid = data.uid;
-			var offset = data.offset | 0;
-			var numImages = data.numImages;
-			var images = db.getImages(uid, numImages, offset, function(results) {
-				var dataToSend = [];
-				for(index = 0; index < results.length; index++){
-					var imageString = getStringFromImage(results[index].FilePath);
-					var time = results[index].DateTime;
-					dataToSend.push({ 'imageString' : imageString, 'time' : time });
-				}
-				println("Emiting images");
-				socket.emit(requestImagesSuccess, dataToSend);
 			});
 		});
 	});
 
-	function println(message){
-		console.log("[" + new Date() + "]" + message);
-	}
+	socket.on(imageEvent, function(data) {
+		println("New image event received");
+		var uid = data.uid;
+		var datetime = parser.toDatabaseDate(data.datetime);
+		var imageString = data.image;
+		saveImage(imageString, uid, datetime);
+	});
 
-	function saveImage(imageString, uid, datetime) {
-		var filepath = './public/images/' + uid + '_' + datetime + '.jpg';
-		var bitmap = new Buffer(imageString, 'base64');
-		//Save Photo to filepath
-		filesystem.writeFileSync(filepath, bitmap);
-		//Record filepath in database
-		db.savePhoto(uid, datetime, filepath);
-	};
+	socket.on(weightEvent, function(data) {
+		println("New weight event received");
+		var uid = data.uid;
+		var weight = data.weight;
+		db.saveWeight(uid, new Date(), weight);
+		db.getLatestHeight(uid, function(results){
+			var height = results[0].height;
+			var bmi = getBMI(weight, height);
+			println("Send to android id " + androidId)
+			io.to(androidId).emit(weightSaved, {
+				'weight': weight,
+				'bmi': bmi
+			});
+		});
+	});
 
-	function getStringFromImage(filepath){
-		var bitmap = fs.readFileSync(filepath);
-		return new Buffer(bitmap).toString('base64');
-	};
+	socket.on(requestLastImages, function(data) {
+		println("Request for previous " + data.numImages + " images received.");
+		var uid = data.uid;
+		var offset = 0;
+		var numImages = data.numImages;
+		var images = db.getImages(uid, numImages, offset, function(results) {
+			var dataToSend = [];
+			for(index = 0; index < results.length; index++){
+				var imageString = getStringFromImage(results[index].FilePath);
+				var time = results[index].DateTime;
+				dataToSend.push({ 'imageString' : imageString, 'time' : time });
+			}
+			println("Emiting images");
+			socket.emit(requestLastImagesSuccess, dataToSend);
+		});
+	});
 
-	function getBMI(weight, height){
-		return weight / (height * height);
-	}
+	socket.on(requestImages, function(data) {
+		println("Request for previous " + data.numImages + " images received.");
+		var uid = data.uid;
+		var offset = data.offset | 0;
+		var numImages = data.numImages;
+		var images = db.getImages(uid, numImages, offset, function(results) {
+			var dataToSend = [];
+			for(index = 0; index < results.length; index++){
+				var imageString = getStringFromImage(results[index].FilePath);
+				var time = results[index].DateTime;
+				dataToSend.push({ 'imageString' : imageString, 'time' : time });
+			}
+			println("Emiting images");
+			socket.emit(requestImagesSuccess, dataToSend);
+		});
+	});
+});
 
-	function getCurrentDate() {
-		var currentDate = new Date();
-		var year = currentDate.getFullYear().toString().substring(2);
-		var month = currentDate.getMonth();
-		var day = currentDate.getDate();
-		var hours = currentDate.getHours();
-		var minutes = currentDate.getMinutes();
-		var seconds = currentDate.getSeconds();
+function println(message){
+	console.log("[" + new Date() + "]" + message);
+}
 
-		return year + '' + month + '' + day + '' + hours + '' + minutes + '' + seconds;
-	};
+function saveImage(imageString, uid, datetime) {
+	var filepath = './public/images/' + uid + '_' + datetime + '.jpg';
+	var bitmap = new Buffer(imageString, 'base64');
+	//Save Photo to filepath
+	filesystem.writeFileSync(filepath, bitmap);
+	//Record filepath in database
+	db.savePhoto(uid, datetime, filepath);
+};
+
+function getStringFromImage(filepath){
+	var bitmap = fs.readFileSync(filepath);
+	return new Buffer(bitmap).toString('base64');
+};
+
+function getBMI(weight, height){
+	return weight / (height * height);
+}
+
+function getCurrentDate() {
+	var currentDate = new Date();
+	var year = currentDate.getFullYear().toString().substring(2);
+	var month = currentDate.getMonth();
+	var day = currentDate.getDate();
+	var hours = currentDate.getHours();
+	var minutes = currentDate.getMinutes();
+	var seconds = currentDate.getSeconds();
+
+	return year + '' + month + '' + day + '' + hours + '' + minutes + '' + seconds;
+};
