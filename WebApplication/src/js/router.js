@@ -2,19 +2,47 @@ var express = require('express');
 var router = express.Router();
 var db = require('./dbManager')('MirrorMirror');
 
-router.get('/', function(req, res) {
-	db.getLastImages(3, 1, function(result){
-		console.log(result[0]);
-		res.render('index', {
-			photo: result[0]
+router.get('/', function(requ, res){
+	res.redirect('/login');
+});
+
+router.get('/home', function(req, res) {
+		res.redirect('/login');
+});
+
+router.get('/home/:uid', function(req, res) {
+		var uid = req.params.uid;
+		db.getFullName(uid, function(name){
+			res.render('home', {
+				uid: uid,
+				name: name
+			});
 		});
-	});
+});
+
+router.get('/home/:uid/weights/:days', function(req, res) {
+		var uid = req.params.uid;
+		var days = req.params.days;
+		db.getFullName(uid, function(name){
+			db.getPreviousWeights(uid, days, function(data){
+				res.render('weightgraph', {
+					uid: uid,
+					name: name,
+					days: days,
+					data: data
+				});
+			});
+		});
 });
 
 router.get('/login', function(req, res) {
 	res.render('login', {
-		title: 'About'
 	});
+});
+
+router.get('/register', function(req, res){
+	res.render('register', {
+	})
 });
 
 module.exports = router;

@@ -5,11 +5,7 @@ import android.icu.text.DecimalFormat;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 import mirrormirror.swen302.mirrormirrorandroid.R;
 
@@ -20,26 +16,34 @@ import mirrormirror.swen302.mirrormirrorandroid.R;
 public class WeightPopupDialog extends AlertDialog {
 
     private TextView weightTextView;
+    private TextView bmiTextView;
     private Double weight;
+    private Double bmi;
 
-    public WeightPopupDialog(@NonNull Context context, Double w) {
+    public WeightPopupDialog(@NonNull Context context, Double w, Double b) {
         super(context);
         this.weight = roundWeight(w);
+        this.bmi = roundWeight(b);
     }
 
-    public void updateWeight(Double w){
+    public void updateValues(Double w, Double b){
         this.weight = roundWeight(w);
         this.weightTextView.setText(this.weight + " kg");
+        this.bmi = roundWeight(b);
+        this.bmiTextView.setText(this.bmi+"");
     }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.input_weight_popup);
+        setContentView(R.layout.weight_popup);
 
         weightTextView = (TextView) findViewById(R.id.weight_label);
         weightTextView.setText(this.weight + " kg");
-
+        bmiTextView = (TextView) findViewById(R.id.bmi_label);
+        bmiTextView.setText(this.bmi+"");
     }
 
     public static Double roundWeight(Double w){
