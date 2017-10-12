@@ -147,16 +147,7 @@ io.on('connection', function(socket) {
 			}
 		});
 	});
-
-
-	socket.on(peakFlowEvent, function(data){
-		println("got new peak flow event");
-		var uid = data.uid;
-		var peakFlow = data.peak_flow;
-
-		db.saveFlow(uid, new Date(), peakFlow)
-	});
-
+	
 	socket.on(imageEvent, function(data) {
 		println("New image event received");
 		var uid = data.uid;
